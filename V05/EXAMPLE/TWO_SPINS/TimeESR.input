@@ -1,0 +1,35 @@
+*****************************************************************
+************* Please keep this FORMAT ***************************
+*****************************************************************
+500000 !Ntime, number of points used in the time propagation
+0.  12. !Initial and final time in nanoseconds
+---------------Pulse definition block----------------------------
+1 ! Number of pulses (must contain zero pulses too)
+1 ! Maximum number of frequencies
+0.  12.  !times for first pulse of zero amplitude
+1. ! Amplitude (loop on Freq is faster)
+17.02717787 ! first  pulse frequency in GHz
+0. ! phase shift in radians for the first interval (no loop on Freq)
+---------------electrode set-up-----------------------------------
+0.2 ! in meV : gamma_R_0= 2*pi*W_R_0*W_R_0*rho
+0.01 ! in meV : gamma_L_0 2*pi*W_L_0*W_L_0*rho
+0.0 ! in meV: gamma_R_1= 2*pi*W_R_0*W_R_1*rho
+0.01 ! in meV: gamma_L_1= 2*pi*W_L_0*W_L_1*rho
+100.0 ! Cutoff (meV) for integral in Lambshift
+.002 ! Broadening of Green's function (meV)
+500000 ! Number of points in I11 and I21 (see Manual)
+---------------bias, temperature, spin polarization---------------
+2.0  ! in mV right electrode bias
+-2.0 ! in mV left electrode bias
+.1   ! Temperature in Kelvin
+0.0   ! Spin polarization of electrode R, between -1 and 1
+1.0   ! Spin polarization of electrode L, between -1 and 1
+0    ! 0 is left and 1 is right electrode
+---------------output file names----------------------------------
+.true. !.true. write POPULATIONS.dat
+C.dat ! file name for the time-dependent current
+S.dat ! file name for the current Fourier transform 
+ESR.dat ! file DC current
+---------------READ previous RUNS: DANGEROUS----------------------------------
+.false. ! Keep to false to avoid reading previous runs
+.true. ! Plot time evolution of spins

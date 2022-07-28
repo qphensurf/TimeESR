@@ -8,7 +8,7 @@ V0.5 only contains one electronic orbital that is coupled to a complex system of
 
 V0.5 is intended for (i) obtaining continuous-wave ESR spectra (our Floquet code is better suited for this) (ii) doing quantum operations driving spins with short pulses (iii) using multiple frequencies for extraordinary operations as is currently done in STM setups already
 
-This particular example is for a "very" long pulse in order to obtain the continuous-wave ESR spectra (CW).
+In the directory /EXAMPLES you have some scripts and input files. There is a particular example for a "very" long pulse in order to obtain the continuous-wave ESR spectra (CW).
 
 The script "script_bash_for_TimESR" removes old files, performs a loop on driving frequencies, creates two new input files as it performs the loop, runs the TimeESR.out executable that has to be in the path and then copies some of the output files with names corresponding to each frequency.
 

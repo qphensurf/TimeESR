@@ -1,0 +1,74 @@
+#!/bin/bash
+rm -rf SpectraESR.dat
+for i in `seq 16.9 0.01 17.1` 
+do
+cat >TimeESR.input <<@
+*****************************************************************
+************* Please keep this FORMAT ***************************
+*****************************************************************
+500000 !Ntime, number of points used in the time propagation
+0.   150. !Initial and final time in nanoseconds
+---------------Pulse definition block----------------------------
+1 ! Number of pulses (must contain zero pulses too)
+1 ! Maximum number of frequencies
+0.  150.  !times for first pulse of zero amplitude
+1. ! Amplitude (loop on Freq is faster)
+$i ! first  pulse frequency in GHz
+0. ! phase shift in radians for the first interval (no loop on Freq)
+---------------electrode set-up-----------------------------------
+0.002 ! in meV : gamma_R_0= 2*pi*W_R_0*W_R_0*rho
+0.0001 ! in meV : gamma_L_0 2*pi*W_L_0*W_L_0*rho
+0.000 ! in meV: gamma_R_1= 2*pi*W_R_0*W_R_1*rho
+0.0002 ! in meV: gamma_L_1= 2*pi*W_L_0*W_L_1*rho
+100.0 ! Cutoff (meV) for integral in Lambshift
+0.002 ! Broadening of Green's function (meV)
+500000 ! Number of points in I11 and I21 (see Manual)
+---------------bias, temperature, spin polarization---------------
+15.0  ! in mV right electrode bias
+-15.0 ! in mV left electrode bias
+.5   ! Temperature in Kelvin
+0.0   ! Spin polarization of electrode R, between -1 and 1
+1.0   ! Spin polarization of electrode L, between -1 and 1
+0    ! 0 is left and 1 is right electrode
+---------------output file names----------------------------------
+.true. !.true. write POPULATIONS.dat
+C.dat ! file name for the time-dependent current
+S.dat ! file name for the current Fourier transform
+ESR.dat ! file DC current
+---------------READ previous RUNS: DANGEROUS----------------------------------
+.true. ! Keep to false to avoid reading previous runs
+.true. ! Plot time evolution of spins
+@
+cat >H_QD.input <<@@
+**********************************************************
+************* Please keep this FORMAT ********************
+**********************************************************
+1  !Number of spins (molecules or sites)
+---- Spin properties: as many blocs as Number of Spins ---
+0.5 ! First spin has to be 0.5 for Transport!
+0 0 0 0 ! Stephen Coefficients: B20 B22 B40 B44
+0 0 1 ! Axis for Stephen Operators
+.60827625 0 0.0 ! Local magnetic field in Teslas
+2.0 2.0 2.0 ! Local gyromagnetic factors
+-----------  End of spin properties ----------------------
+0  !Number of exchange connected pairs
+-----------  End of exchange interactions ----------------
+-10.0 ! eps_QD  electronic level in meV
+100.0000 ! Hubbard U (meV)
+-----------  End of electronic interactions --------------
+Hamiltonian.output ! Name of the output file with H
+4 ! Number of states to print in Spin_distribution.dat
+**********************************************************
+************* END of INPUT FILE H_QD.input ***************
+**********************************************************
+@@
+echo "Frequency (GHz)::" $i
+TimeESR04.out
+E=`tail -1 ESR.dat` ; echo $i $E >> SpectraESR.dat
+cp POPULATIONS.dat POP$i.dat
+cp COHERENCES.dat COH$i.dat
+cp SpinDynamics.dat SP$i.dat
+done
+
+
+

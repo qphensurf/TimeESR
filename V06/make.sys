@@ -51,7 +51,7 @@ DFLAGS =
 #DFLAGS += -D__DEBUG
 
 # Intel compiler
-FFLAGS += -warn unused,uncalled -fp-stack-check -traceback -gen-interfaces -warn interfaces -check
+#FFLAGS += -warn unused,uncalled -fp-stack-check -traceback -gen-interfaces -warn interfaces -check
 
 # Intel compiler (severe check)
 #FFLAGS = -O0 -debug all -check all -warn all -extend-source 132 -traceback -gen-interfaces -fpe-all=0 -fp-stack-check -fstack-protector-all -ftrapuv -no-ftz -standard-semantics

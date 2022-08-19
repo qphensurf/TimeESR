@@ -149,6 +149,9 @@ CONTAINS
     enddo
 
 ! t_seq is an array of indices that maps the time into the corresponding pulse
+   
+    ! Initialize t_seq array
+    t_seq = 1
     
     do i=1, Ntime
      do n = 1, Ninterval

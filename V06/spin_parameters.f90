@@ -1,156 +1,117 @@
 module spin_parameters
-use declarations, only: q, qc, ur, ui, zero
-use declarations, only: sqr2, sqr3, sqr5, sqr6, sqr7, sqr8
-CONTAINS
-   ! Pauli matrices initialized in main
-   Subroutine Pauli (Nm, N_in, Sx_u, Sy_u, Sz_u)
-   implicit none
-   integer :: i 
-   integer, parameter :: Ndim=6
-   integer, intent (in) :: Nm
-   integer, intent (in) :: N_in (:)
-   complex (qc), allocatable :: Sx_u (:,:,:), Sy_u (:,:,:), Sz_u (:,:,:)
    
-  allocate (Sx_u(Nm,Ndim,Ndim),Sy_u(Nm,Ndim,Ndim),Sz_u(Nm,Ndim,Ndim))
+   use declarations, only: q, qc, ur, ui, zero, Spin
+   use error_handler, only: errore
 
+contains
 
-! we divide by 2 at the end of the subroutine
-   Sx_u = zero
-   Sy_u = zero
-   Sz_u = zero
-
-! first site
-   Sx_u (1,1,2)=ur
-   Sx_u (1,2,1)=ur
-   Sy_u (1,1,2)=-ui
-   Sy_u (1,2,1)=ui
-   Sz_u (1,1,1)=ur
-   Sz_u (1,2,2)=-ur
-! remember dimension is larger because it includes electronic levels
-   do i=2,Nm
-
-! spin 1/2
-   if (N_in (i) == 2) then
-      Sx_u (i,1,2)=ur
-      Sx_u (i,2,1)=ur
-
-      Sy_u (i,1,2)=-ui
-      Sy_u (i,2,1)=ui
-
-      Sz_u (i,1,1)=ur
-      Sz_u (i,2,2)=-ur
-!spin 1
-  else if (N_in (i) == 3) then
-      Sx_u (i,1,2)=sqr2 
-      Sx_u (i,2,1)=sqr2
-      Sx_u (i,2,3)=sqr2
-      Sx_u (i,3,2)=sqr2
-
-      Sy_u (i,1,2)=-ui*sqr2
-      Sy_u (i,2,1)=ui*sqr2
-      Sy_u (i,2,3)=-ui*sqr2
-      Sy_u (i,3,2)=ui*sqr2
+   subroutine Pauli( Nm, N_in, Sx_u, Sy_u, Sz_u )
+   ! Build pauli matrices. This routine should be initialized in main.
    
-      Sz_u (i,1,1)=ur*2
-      Sz_u (i,3,3)=-ur*2
-
-   else if (N_in (i) == 4) then
-
-      Sx_u (i,1,2)=sqr3
-      Sx_u (i,2,1)=sqr3
-      Sx_u (i,2,3)=2._q
-      Sx_u (i,3,2)=2._q
-      Sx_u (i,3,4)=sqr3
-      Sx_u (i,4,3)=sqr3
-
-      Sy_u (i,1,2)=-ui*sqr3
-      Sy_u (i,2,1)=ui*sqr3
-      Sy_u (i,2,3)=-ui*2._q
-      Sy_u (i,3,2)=ui*2._q
-      Sy_u (i,3,4)=-ui*sqr3
-      Sy_u (i,4,3)=ui*sqr3
-   
-      Sz_u (i,1,1)=3._q
-      Sz_u (i,2,2)=1._q
-      Sz_u (i,3,3)=-1._q
-      Sz_u (i,4,4)=-3._q
-
-   else if (N_in (i) == 5) then
-
-      Sx_u (i,1,2)=2._q
-      Sx_u (i,2,1)=2._q
-      Sx_u (i,2,3)=sqr6
-      Sx_u (i,3,2)=sqr6
-      Sx_u (i,3,4)=sqr6
-      Sx_u (i,4,3)=sqr6
-      Sx_u (i,4,5)=2._q
-      Sx_u (i,5,4)=2._q
-
-
-      Sy_u (i,1,2)=-ui*2._q
-      Sy_u (i,2,1)=ui*2._q
-      Sy_u (i,2,3)=-ui*sqr6
-      Sy_u (i,3,2)=ui*sqr6
-      Sy_u (i,3,4)=-ui*sqr6
-      Sy_u (i,4,3)=ui*sqr6
-      Sy_u (i,4,5)=-ui*2._q
-      Sy_u (i,5,4)=ui*2._q
+      implicit none
        
-      Sz_u (i,1,1)=4._q
-      Sz_u (i,2,2)=2._q
-      Sz_u (i,4,4)=-2._q
-      Sz_u (i,5,5)=-4._q
+      ! Arguments
+      integer, intent(in) :: Nm
+      integer, intent(in) :: N_in(:) ! 2s+1
+      complex(qc), allocatable, intent(inout) :: Sx_u(:,:,:), Sy_u(:,:,:), Sz_u(:,:,:)
+      
+      ! Local variables
+      integer :: i, ierr, mdim, ndim, imol, im, jm 
+      real(q) :: sval, mval
+      complex(qc), allocatable :: Sp_u(:,:,:), Sm_u(:,:,:)
+      
+      ! Maximum dimension of spin matrices (must be at least as large as spin 1/2 space + 2 electronic levels)
+      ndim = maxval(N_in)
+      
+      ! Safe allocate matrices
+      if(allocated(Sp_u)) deallocate(Sp_u)
+      if(allocated(Sm_u)) deallocate(Sm_u)
+      if(allocated(Sx_u)) deallocate(Sx_u)
+      if(allocated(Sy_u)) deallocate(Sy_u)
+      if(allocated(Sz_u)) deallocate(Sz_u)
+      
+      allocate(Sp_u(Nm,ndim,ndim),stat=ierr)
+      if(ierr .ne. 0) call errore( 'Pauli', 'memory allocation failed on Sp_u', ierr)
+      allocate(Sm_u(Nm,ndim,ndim),stat=ierr)
+      if(ierr .ne. 0) call errore( 'Pauli', 'memory allocation failed on Sm_u', ierr)
+      allocate(Sx_u(Nm,ndim,ndim),stat=ierr)
+      if(ierr .ne. 0) call errore( 'Pauli', 'memory allocation failed on Sx_u', ierr)
+      allocate(Sy_u(Nm,ndim,ndim),stat=ierr)
+      if(ierr .ne. 0) call errore( 'Pauli', 'memory allocation failed on Sy_u', ierr)
+      allocate(Sz_u(Nm,ndim,ndim),stat=ierr)
+      if(ierr .ne. 0) call errore( 'Pauli', 'memory allocation failed on Sz_u', ierr)
+      
+      Sp_u = zero
+      Sm_u = zero
+      Sx_u = zero
+      Sy_u = zero
+      Sz_u = zero
+      
+      ! Fill matrices for each spin object
+      do imol = 1, Nm
+         
+         ! Spin value of object
+         sval = Spin(imol)
+         mdim = int((2._q * sval) + 1._q)
+         
+         do im = 1, mdim-1 ! row
+            
+            mval = zero
+            mval = sval - REAL(im,q)
+            jm = im + 1 ! column
+            
+            ! Fill out the plus matrix according to
+            ! Splus[1:] = [ 0 \sqrt(s(s+1) - s(s+1)) 0 ...], Splus[2:] = [ 0 0 \sqrt(s(s+1) - (s-1)((s-1)+1)) 0 ...], Splus[3:] = [ 0 0 0 \sqrt(s(s+1) - m(m+1)) ...]
+            Sp_u(imol,im,jm) = SQRT(( sval * ( sval + 1._q )) - ( mval * ( mval + 1._q ) ))
+            
+            ! Sminus is transpose of Splus
+            Sm_u(imol,jm,im) = Sp_u(imol,im,jm)
+            
+            ! Sz is easy
+            Sz_u(imol,im,im) = mval + ur
+         
+         end do
+         
+         Sz_u(imol,mdim,mdim) = -ur * sval
+         
+      end do
+      
+      ! Factors of 1/2 where appropriate
+      Sx_u = 0.5_q * ( Sp_u + Sm_u )
+      Sy_u = -ui * 0.5_q * ( Sp_u - Sm_u )
+      
+      ! Deallocate 
+      deallocate( Sp_u )
+      deallocate( Sm_u )
 
-   else if (N_in (i) == 6) then
+#ifdef __DEBUG
+      do imol = 1, Nm
+         sval = Spin(imol)
+         mdim = int((2._q * sval) + 1._q)
+         write(*,'(/A,I1,A,F3.1)') "Spin of mol ", imol,": ",sval
+         write(*,'(A,I1)') "Sx_u for mol ", imol
+         do im = 1, mdim
+            do jm = 1, mdim
+               write(*,'(2I5,2F20.10)') im, jm, REAL(Sx_u(imol,im,jm),q), IMAG(Sx_u(imol,im,jm))
+            end do
+         end do
+         
+         write(*,'(A,I1)') "Sy_u for mol ", imol
+         do im = 1, mdim
+            do jm = 1, mdim
+               write(*,'(2I5,2F20.10)') im, jm, REAL(Sy_u(imol,im,jm),q), IMAG(Sy_u(imol,im,jm))
+            end do
+         end do
+         
+         write(*,'(A,I1)') "Sz_u for mol ", imol
+         do im = 1, mdim
+            do jm = 1, mdim
+               write(*,'(2I5,2F20.10)') im, jm, REAL(Sz_u(imol,im,jm),q), IMAG(Sz_u(imol,im,jm))
+            end do
+         end do
+      end do
+#endif
 
-      Sx_u (i,1,2)=sqr5
-      Sx_u (i,2,1)=sqr5
-      Sx_u (i,2,3)=sqr8
-      Sx_u (i,3,2)=sqr8
-      Sx_u (i,3,4)=3._q
-      Sx_u (i,4,3)=3._q
-      Sx_u (i,4,5)=sqr8
-      Sx_u (i,5,4)=sqr8
-      Sx_u (i,5,6)=sqr5
-      Sx_u (i,6,5)=sqr5
-
-      Sy_u (i,1,2)=-ui*sqr5
-      Sy_u (i,2,1)=ui*sqr5
-      Sy_u (i,2,3)=-ui*sqr8
-      Sy_u (i,3,2)=ui*sqr8
-      Sy_u (i,3,4)=-ui*3._q
-      Sy_u (i,4,3)=ui*3._q
-      Sy_u (i,4,5)=-ui*sqr8
-      Sy_u (i,5,4)=ui*sqr8
-      Sy_u (i,5,6)=-ui*sqr5
-      Sy_u (i,6,5)=ui*sqr5
-
-      Sz_u (i,1,1)=5._q
-      Sz_u (i,2,2)=3._q
-      Sz_u (i,3,3)=1._q
-      Sz_u (i,4,4)=-1._q
-      Sz_u (i,5,5)=-3._q
-      Sz_u (i,6,6)=-5._q
-
-   else if (N_in (i) > 6 ) then
-
-      write (*,*) ' '
-      write (*,*) ' ERROR:'
-      write (*,*) ' We have only considered spins up to 5/2'
-      write (*,*) ' please go to subroutine  Pauli '
-      write (*,*) ' and write the corresponding Pauli-like matrices!!'
-      write (*,*) ' Stop.'      
-      write (*,*) ' '
-      stop
-    
-   endif
-
-   enddo
-
-    Sx_u = 0.5_q*Sx_u
-    Sy_u = 0.5_q*Sy_u
-    Sz_u = 0.5_q*Sz_u
-
-
-   end Subroutine Pauli
+   end subroutine Pauli
+   
 end module  spin_parameters

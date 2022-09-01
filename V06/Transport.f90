@@ -59,7 +59,7 @@ CONTAINS
          do u = 1, Ndim
          do j = 1, Ndim
       curr (i) = curr (i) +    &
-            real(rho (l,u,i)*(GC(l,j,j,u)+conjg(GC(u,j,j,l)))*  &
+            (rho (l,u,i)*GC(l,j,j,u)+conjg(rho (l,u,i))*conjg(GC(u,j,j,l))*  &
             (1+Pulse*((1-Electrode)*gamma_L_1/gamma_L_0+Electrode*gamma_R_1/gamma_R_0)))
          enddo
          enddo

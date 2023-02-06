@@ -1,0 +1,29 @@
+**********************************************************
+************* Please keep this FORMAT ********************
+**********************************************************
+2              ! Number of spins (molecules or sites)
+---- Spin properties -------------------------------------
+0.5            ! First spin has to be 0.5 for Transport!
+0 0 0 0        ! Stephen Coefficients: B20 B22 B40 B44
+0 0 1          ! Axis for Stephen Operators
+0.5 0.0 0.0    ! Local magnetic field in Teslas 0.5T -> 13.9953 GHz
+2.0 2.0 2.0    ! Local gyromagnetic factors
+----------------------------------------------------------
+0.5	       ! Second Spin
+0 0 0 0        ! Stephen Coefficients: B20 B22 B40 B44
+0 0 1	       ! Axis for Stephen Operators
+0.5 0.0 0.0    ! Local magnetic field in Teslas
+2. 2. 2.       ! Local gyromagnetic factors
+----------------------------------------------------------
+1              ! Number of exchange connected pairs
+1  2           ! Connected pairs
+-5. -5. -5.    ! Jx, Jy, Jz in GHz
+-----------  End of exchange interactions ----------------
+-10.0          ! eps_QD  electronic level in meV
+100.0000       ! Hubbard U (meV)
+-----------  End of electronic interactions --------------
+Hamiltonian.output ! Name of the output file with H
+100                ! Number of states to print in Spin_distribution.dat
+**********************************************************
+************* END of INPUT FILE H_QD.input ***************
+**********************************************************

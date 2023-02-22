@@ -22,7 +22,7 @@ The two input files are
 
 (2) H_QD.input ! sets up the Hamiltonian corresponding to the "impurity", where the impurity is a single electronic level (with 4 states: donw, up, zero and double, corresponding to the single, empty or double electron occupations) Hunds-coupled to a "Spin Hamiltonian" (meaning any sequence of spins with anisotropies, local magnetic fields and pair-exchange interactions).
 
-The files are commented (in the bash script joined here) so you can now what entry is what.
+The files are commented (in the bash script joined here) so you can know what entry is what.
 
 Troubleshooting:: Possible mistakes when running the code: 1- The total duration of the running interval must correspond to the sum of all intervals of all pulses 2- When you set up the driving pulses, make sure that frequency and amplitude of the pulse correspond (this is important for ENDOR experiments or other with several frequencies) 3- If you have an overall magnetic field, this goes in the H_QD.input and is added to each local magnetic field, there is no key or entry for an overall magnetic field 4- Make sure that the number of pairs with exchange interactions match the number of spins divided by two (the code will crash if not) 5- Check if the key is .true. or .false. for reading the impurity's eigenstates of the previous run. Depending on what you are looping on you may not want to read again the same eigenstates (basically you will be doing the "same" run if nothing changed in TimeESR.input)
 

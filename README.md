@@ -1,4 +1,4 @@
-# TimESR
+# TimeESR
 STM-ESR code solving a QME in the time domain
 TimeESR.f90 code is given as is and subjected to gnu 3.0 CopyLeft.
 

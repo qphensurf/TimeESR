@@ -5,7 +5,7 @@ program TimeESR
 ! Phys. Rev. B Physical Review B 104 (24), 245435 (2021)
 
 !
-! gnu licence 3.0 (c) J. Reina Galvez & N. Lorente
+! gnu licence 3.0 (c) J. Reina Galvez, E. D. Switzer, C. Wolf & N. Lorente
 !
 !  Release version 1.0.0
 !  2023 February 24

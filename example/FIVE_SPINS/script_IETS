@@ -1,0 +1,155 @@
+#!/bin/bash
+rm -rf Corriente*
+rm -rf H_QD.input
+rm -rf POP*
+cat >H_QD.input <<@@@@
+**********************************************************
+************* Please keep this FORMAT ********************
+**********************************************************
+5  !Number of spins (molecules or sites)
+---- Spin properties: as many blocs as Number of Spins ---
+0.5 ! First spin has to be 0.5 for Transport!
+0 0 0 0 ! Stephen Coefficients: B20 B22 B40 B44
+0 0 1 ! Axis for Stephen Operators
+0. 0 0.0 ! Local magnetic field in Teslas
+2.0 2.0 2.0 ! Local gyromagnetic factors
+-----------  Second spin  ----------------------
+1.0 ! First spin has to be 0.5 for Transport!
+1.334 0 0 0 ! Stephen Coefficients: B20 B22 B40 B44
+0 0 1 ! Axis for Stephen Operators
+0. 0. 0.0 ! Local magnetic field in Teslas
+2.0 2.0 2.0 ! Local gyromagnetic factors
+-----------  Third spin  ----------------------
+1.0 ! Spin
+1.334 0 0 0 ! Stephen Coefficients: B20 B22 B40 B44
+0 0 1 ! Axis for Stephen Operators
+0. 0. 0.0 ! Local magnetic field in Teslas
+2.0 2.0 2.0 ! Local gyromagnetic factors
+-----------  Fourth spin  ----------------------
+0.5 ! Spin
+0 0 0 0 ! Stephen Coefficients: B20 B22 B40 B44
+0 0 1 ! Axis for Stephen Operators
+0. 0. 0.0 ! Local magnetic field in Teslas
+2.0 2.0 2.0 ! Local gyromagnetic factors
+-----------  Fifth spin  ----------------------
+0.5 ! Spin
+0 0 0 0 ! Stephen Coefficients: B20 B22 B40 B44
+0 0 1 ! Axis for Stephen Operators
+0. 0. 0.0 ! Local magnetic field in Teslas
+2.0 2.0 2.0 ! Local gyromagnetic factors
+-----------  End of spin properties ----------------------
+4  !Number of exchange connected pairs
+1  2 ! connected pairs
+-1000 -1000 -1000  !Jx, Jy, Jz in GHz
+2  3 ! connected pairs
+3750 3750 3750  !Jx, Jy, Jz in GHz
+3  4 ! connected pairs
+-6800 -6800 -6800  !Jx, Jy, Jz in GHz
+2  5 ! connected pairs
+-6800 -6800 -6800  !Jx, Jy, Jz in GHz
+-----------  End of exchange interactions ----------------
+30.0 ! eps_QD  electronic level in meV
+0.0000 ! Hubbard U (meV)
+-----------  End of electronic interactions --------------
+Hamiltonian.output ! Name of the output file with H
+20 ! Number of states to print in Spin_distribution.dat
+**********************************************************
+************* END of INPUT FILE H_QD.input ***************
+**********************************************************
+@@@@
+for i in `seq 15. -0.5 0.5`
+do
+cat >TimeESR.input <<@@
+*****************************************************************
+************* Please keep this FORMAT ***************************
+*****************************************************************
+10000 !Ntime, number of points used in the time propagation
+0.   0.2 !Initial and final time in nanoseconds
+---------------Pulse definition block----------------------------
+1 ! Number of pulses (must contain zero pulses too)
+1 ! Maximum number of frequencies
+0.  0.2  !times for first pulse of zero amplitude
+1. ! Amplitude (loop on Freq is faster)
+50. ! first  pulse frequency in GHz
+0. ! phase shift in radians for the first interval (no loop on Freq)
+---------------electrode set-up-----------------------------------
+100. ! in meV : gamma_R_0= 2*pi*W_R_0*W_R_0*rho
+0.1 ! in meV : gamma_L_0 2*pi*W_L_0*W_L_0*rho
+0.000 ! in meV: gamma_R_1= 2*pi*W_R_0*W_R_1*rho
+0.000 ! in meV: gamma_L_1= 2*pi*W_L_0*W_L_1*rho
+100.0 ! Cutoff (meV) for integral in Lambshift
+1.000 ! Broadening of Green's function (meV)
+500000 ! Number of points in I11 and I21 (see Manual)
+---------------bias, temperature, spin polarization---------------
+0 ! in mV right electrode bias
+-$i ! in mV left electrode bias
+5.0   ! Temperature in Kelvin
+0.0   ! Spin polarization of electrode R, between -1 and 1
+0.0   ! Spin polarization of electrode L, between -1 and 1
+0    ! 0 is left and 1 is right electrode
+---------------output file names----------------------------------
+.true. !.true. write POPULATIONS.dat
+C.dat ! file name for the time-dependent current
+S.dat ! file name for the current Fourier transform
+DC.dat ! file DC current
+---------------READ previous RUNS: DANGEROUS----------------------------------
+.true. ! Keep to false to avoid reading previous runs
+.true. ! Plot time evolution of spins
+.true. ! redimnesion
+12 !cannale
+@@
+TimeESR06b.out
+b=`echo "$i" |bc`
+E=`tail -1 DC.dat` ; echo -$b $E >> Corriente_DC.dat
+cp POPULATIONS.dat POPn$i.dat
+done
+for i in `seq 0.5 0.5 15`
+do 
+cat >TimeESR.input <<@@@
+*****************************************************************
+************* Please keep this FORMAT ***************************
+*****************************************************************
+10000 !Ntime, number of points used in the time propagation
+0.   0.2 !Initial and final time in nanoseconds
+---------------Pulse definition block----------------------------
+1 ! Number of pulses (must contain zero pulses too)
+1 ! Maximum number of frequencies
+0.  0.2  !times for first pulse of zero amplitude
+1. ! Amplitude (loop on Freq is faster)
+50. ! first  pulse frequency in GHz
+0. ! phase shift in radians for the first interval (no loop on Freq)
+---------------electrode set-up-----------------------------------
+100. ! in meV : gamma_R_0= 2*pi*W_R_0*W_R_0*rho
+0.1 ! in meV : gamma_L_0 2*pi*W_L_0*W_L_0*rho
+0.000 ! in meV: gamma_R_1= 2*pi*W_R_0*W_R_1*rho
+0.000 ! in meV: gamma_L_1= 2*pi*W_L_0*W_L_1*rho
+100.0 ! Cutoff (meV) for integral in Lambshift
+1.00 ! Broadening of Green's function (meV)
+500000 ! Number of points in I11 and I21 (see Manual)
+---------------bias, temperature, spin polarization---------------
+0 ! in mV right electrode bias
+$i ! in mV left electrode bias
+5.0   ! Temperature in Kelvin
+0.0   ! Spin polarization of electrode R, between -1 and 1
+0.0   ! Spin polarization of electrode L, between -1 and 1
+0    ! 0 is left and 1 is right electrode
+---------------output file names----------------------------------
+.true. !.true. write POPULATIONS.dat
+C.dat ! file name for the time-dependent current
+S.dat ! file name for the current Fourier transform
+DC.dat ! file DC current
+---------------READ previous RUNS: DANGEROUS----------------------------------
+.true. ! Keep to false to avoid reading previous runs
+.true. ! Plot time evolution of spins
+.true. ! redimnesion
+12 !cannale
+@@@
+TimeESR06b.out
+b=`echo "$i" |bc`
+E=`tail -1 DC.dat` ; echo $b $E >> Corriente_DC.dat
+cp POPULATIONS.dat POP$i.dat
+done
+
+
+
+

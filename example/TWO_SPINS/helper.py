@@ -107,9 +107,8 @@ def animate_bloch_plot( bloch_obj, time_obj, movie_slice_step, filename='bloch_m
    print("Trajectory saved!")
 
    # Movie
-   print("Please disregard the warning on Axes3D: the movie will still generate. This will be fixed in an upcoming version release.")
    fig = plt.figure()
-   ax = Axes3D(fig, azim=-40, elev=30)
+   ax = fig.add_subplot(111, projection="3d", elev=30, azim=-40)
    sphere = qutip.Bloch(axes=ax)
 
    def init():
@@ -146,13 +145,23 @@ def project_bloch_sphere( rho_0_state_num, rho_1_state_num, rho_total_printed_st
    data_new = np.zeros([len(data[:,0]),4])
 
    # Inform user
-   print("Building Bloch sphere where |0> corresponds to eigenstate",rho_0_state_num,"and |1> corresponds to eigenstate",rho_1_state_num)
-   print("For reference, rho_00, rho_01, and rho_10 elements are taken from 'RHO.dat'.")
-   print("The corresponding column numbers for the real entries of those elements in that file are:",indx_Re_00,",",indx_Re_01,", and",indx_Re_11)
+   print("Building Bloch sphere where |0> corresponds to eigenstate "+str(rho_0_state_num)+" and |1> corresponds to eigenstate "+str(rho_1_state_num))
+   print("For reference, rho_00, rho_01, and rho_10 elements are taken from 'RHO.dat'")
+   print("The corresponding column numbers in 'RHO.dat' for the real entries of those elements are: "+str(indx_Re_00)+", "+str(indx_Re_01)+", and "+str(indx_Re_11))
 
    # Form sub density matrix block
+   
+   # note for flipped order rho states, i.e. one chooses rho_0_state_num > rho_1_state_num: rho_new = U rho U^dagger, where U = [[0,1],[1,0]]
+   # assigning rho_(rho_0_state_num,rho_0_state_num) = b, rho_(rho_1_state_num,rho_1_state_num) = a
+   # and rho_(rho_1_state_num,rho_0_state_num) = c,
+   # rho originally was [[a,c],[c*, b]], and upon transformation, rho_new = [[b,c*],[c,a]]
+   # Notice the flip of c* and c.
+   
    rho_sub[:,0,0] = data[:,indx_Re_00] + (1.0j*data[:,indx_Im_00])
-   rho_sub[:,0,1] = data[:,indx_Re_01] + (1.0j*data[:,indx_Im_01])
+   if rho_0_state_num > rho_1_state_num:
+      rho_sub[:,0,1] = data[:,indx_Re_01] + (-1.0j*data[:,indx_Im_01])
+   else:
+      rho_sub[:,0,1] = data[:,indx_Re_01] + (1.0j*data[:,indx_Im_01])
    rho_sub[:,1,0] = np.conjugate(rho_sub[:,0,1])
    rho_sub[:,1,1] = data[:,indx_Re_11] + (1.0j*data[:,indx_Im_11])
 
@@ -201,11 +210,11 @@ def project_bloch_sphere( rho_0_state_num, rho_1_state_num, rho_total_printed_st
       if rotframe:
          # Get frequencies
          x_freq = extract_peak_frequency(data_new[:,1], data_new[0,0], data_new[-1,0], len(data_new[:,0]))
-         print("Peak frequency of oscillations in the x-axis of the Bloch sphere before rotation transformation is",x_freq,"GHz")
+         print("Peak frequency of oscillations in the x-axis of the Bloch sphere after rotation transformation is",x_freq,"GHz")
          y_freq = extract_peak_frequency(data_new[:,2], data_new[0,0], data_new[-1,0], len(data_new[:,0]))
-         print("Peak frequency of oscillations in the y-axis of the Bloch sphere before rotation transformation is",y_freq,"GHz")
+         print("Peak frequency of oscillations in the y-axis of the Bloch sphere after rotation transformation is",y_freq,"GHz")
          z_freq = extract_peak_frequency(data_new[:,3], data_new[0,0], data_new[-1,0], len(data_new[:,0]))
-         print("Peak frequency of oscillations in the z-axis of the Bloch sphere before rotation transformation is",z_freq,"GHz")
+         print("Peak frequency of oscillations in the z-axis of the Bloch sphere after rotation transformation is",z_freq,"GHz")
       else:
          # Get frequencies
          x_freq = extract_peak_frequency(data_new[:,1], data_new[0,0], data_new[-1,0], len(data_new[:,0]))

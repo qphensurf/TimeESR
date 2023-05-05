@@ -151,6 +151,15 @@ CONTAINS
               print *, ' '
               stop
          endif
+         
+         if (Freq_seq (1,1) .eq. 0._q) then   ! must need at least a non-zero frequency for DC Current and DC Populations
+              print *, ' '
+              print *, ' ERROR: non-zero frequency needed for first frequency in order for DC current and DC Pop to be calculated.'
+              print *, ' Please change this in TimeESR.input'
+              print *, 'STOP.'
+              print *, ' '
+              stop
+         endif
 
 
 ! creation of the time arrays for Runge Kutta and for pulse generation
@@ -313,7 +322,8 @@ CONTAINS
       
 
       else ! I assume one only freq. Probably no sense for more than two Freq
-
+      
+      ! Starting frequency of zero doesn't work here, so make sure that we catch this in the input
       period =2._q*pi_d/Freq_seq (1,1)
       stept = (time(2)-time(1))
       indexperiod = int(period/stept)

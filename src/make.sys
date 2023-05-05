@@ -58,8 +58,8 @@ DFLAGS =
 #DFLAGS += -D__UNDERANDOVER
 
 # GNU compiler
-#FFLAGS = -g 
-#FFLAGS += -ffpe-trap=invalid,zero,overflow,underflow
+#FFLAGS = -g
+#FFLAGS += -ffpe-trap=invalid,zero,overflow,underflow -fbacktrace
 
 # Intel compiler
 #FFLAGS += -warn unused,uncalled -fp-stack-check -traceback -gen-interfaces -warn interfaces -check

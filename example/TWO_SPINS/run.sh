@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rundir=$(pwd)
-progdir="/home/qns/Research/TimESR/Release/src"
+progdir="../../src"
 ./clean.sh
 
 cd $progdir
@@ -22,3 +22,5 @@ xdg-open SPINz.png &
 xdg-open Current.png &
 
 python bloch_sphere.py
+xdg-open bloch_sphere.png &
+xdg-open bloch_movie.mp4 &

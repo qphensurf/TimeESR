@@ -272,7 +272,7 @@ CONTAINS
 ! Determine whether we have one or two frequencies 
 
       allocate (DC_pop (Ndim)) !DC_pop contains the "average" population
-      allocate (DC_rho (Ndim, Ntime)) !DC_pop contains the "average" population
+      allocate (DC_rho (Ndim, Ntime)) !DC_rho contains the "average" diagonal density matrix elements
       do i = 1, Ndim
         DC_rho (i,:) = 0.5* rho(i,i,:)
       enddo
@@ -391,7 +391,7 @@ CONTAINS
   close (unit_output)
   open (unit_output, file='POP_AVE.dat')
 
-      write (unit_output, *) (real(DC_pop (i)), i=1,Ndim) !picoAmp units
+      write (unit_output, *) (real(DC_pop (i)), i=1,Ndim) ! occupation units
 
   close (unit_output)
 

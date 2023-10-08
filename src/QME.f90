@@ -296,6 +296,7 @@ CONTAINS
      integer :: n, l, j, i, u, v, m, nb
      real (q) :: half
      complex (qc), allocatable :: k1(:), k2(:), k3(:), k4(:), D(:), P(:)
+     logical :: print_flag
 
       
      allocate (k1(Ndim*Ndim), k2(Ndim*Ndim), k3(Ndim*Ndim), k4(Ndim*Ndim))
@@ -308,12 +309,13 @@ CONTAINS
      allocate (ufermiL_a(Ndim,Ndim,Nbias))
 
 ! Bias intergal
+     print_flag = .TRUE.
      do n = 1, Nbias
 ! I11 and I21 from the Manual are honored here:
      do j=1,Ndim
      do u=1,Ndim
-      call ExtendedFermiIntegral ( Delta (j,u), bias_R (n), Temperature, Cutoff, GammaC, N_int, fermiR)
-      call ExtendedFermiIntegral ( Delta (j,u), bias_L (n), Temperature, Cutoff, GammaC, N_int,  fermiL)
+      call ExtendedFermiIntegral ( Delta (j,u), bias_R (n), Temperature, Cutoff, GammaC, N_int, fermiR, n, j, u, 'R', print_flag )
+      call ExtendedFermiIntegral ( Delta (j,u), bias_L (n), Temperature, Cutoff, GammaC, N_int,  fermiL, n, j, u, 'L', print_flag )
       call ExtendeduFermiIntegral ( Delta (j,u), bias_R (n), Temperature, Cutoff, GammaC, N_int, ufermiR)
       call ExtendeduFermiIntegral ( Delta (j,u), bias_L (n), Temperature, Cutoff, GammaC, N_int,  ufermiL)
 !The idea is to create an array and pass it to the rates routine
@@ -546,13 +548,16 @@ CONTAINS
 
 
 ! Calculation of energy integration of rates involving the Fermi function
-      subroutine ExtendedFermiIntegral ( D, V, T, Cutoff, GammaC, N,  fermiA)
+      subroutine ExtendedFermiIntegral ( D, V, T, Cutoff, GammaC, N,  fermiA, i_n, i_j, i_u, bias_dir, print_flag )
       implicit none
       real (q) :: D, V, T, Cutoff, GammaC
       real (q) :: e, step_e
       integer :: i, N
       complex (qc):: fermiA
       logical :: truncate_flag
+      integer :: i_n, i_j, i_u
+      character(len=*) :: bias_dir
+      logical :: print_flag
 !fermiA is Integral I11 of the Manual
 ! Trapeze-integration (the best among the better)
 
@@ -569,7 +574,7 @@ CONTAINS
          ! (e-D,-GammaC) and the denominator becomes |(e-D,GammaC)|^2. The first step
          ! may underflow the real register, and so we handle it the best we can.
          if(Fermi(e-V,T) .ne. 0._q) then
-            if((log(Fermi(e-V,T)) + log(abs(e-D)))-4._q .ge. log(tiny(1._q))) then
+            if((log(Fermi(e-V,T)) + log(abs(e-D)))-6._q .ge. log(tiny(1._q))) then
                fermiA = fermiA + Fermi(e-V,T) / (e - D + ui*GammaC)
             else
                truncate_flag = .TRUE.
@@ -578,7 +583,14 @@ CONTAINS
         
       enddo
       
-      if(truncate_flag) write(*,*) "Performed at least one truncation of a term in the ExtendedFermiIntegral subroutine"
+      if(truncate_flag) then
+         if (print_flag) then
+            write(*,*) "Truncated ExtendedFermiIntegral, &
+                        for bias direction, number, and state combination: "
+            print_flag = .FALSE.
+         end if
+         write(*,*) trim(bias_dir), i_n, i_j, i_u
+      end if
       
       e = Cutoff
       fermiA = fermiA + 0.5_q*Fermi(e-V,T) / (e - D + ui*GammaC)

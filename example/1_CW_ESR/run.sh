@@ -10,9 +10,37 @@ make
 
 cd $rundir
 
+# Write the Hamiltonian input file
+cat >H_QD.input <<@
+*****************************************************************
+******** Please keep this FORMAT, including seperators **********
+*****************************************************************
+1                  ! Number of spins (molecules or sites)
+------------------- Spin properties: Spin 1 ---------------------
+0.5                ! First spin must be 0.5 for transport
+0 0 0 0            ! Stephen Coefficients: B20 B22 B40 B44
+0 0 1              ! Axis for Stephen Operators
+.60827625 0.0 0.0  ! Local magnetic field (T)
+2.0 2.0 2.0        ! Local gyromagnetic factors
+------------------- Exchange interactions -----------------------
+0                  ! Number of exchange connected pairs
+------------------- Electronic interactions ---------------------
+-10.0              ! eps_QD electronic level (meV)
+100.0000           ! Hubbard U (meV)
+------------------- Output options ------------------------------
+Hamiltonian.output ! Name of the output file with H
+4                  ! Number of states to print in Spin_distribution.dat
+.true.             ! .true. Write pre-diagonalized Hamiltonian to PD_HAMIL.dat
+.true.             ! .true. Write all eigenvectors to EIGENVECT.dat
+*****************************************************************
+***************** END of INPUT FILE H_QD.input ******************
+*****************************************************************
+@
+
+# Perform a DC simulation for a series of frequencies in order to produce a CW-ESR-like plot
 for i in `seq 16.9 0.01 17.1` 
 do
-cat >TimeESR.input <<@
+cat >TimeESR.input <<@@
 *****************************************************************
 ******** Please keep this FORMAT, including seperators **********
 *****************************************************************
@@ -54,33 +82,8 @@ ESR.dat      ! file DC current
 .true.       ! Plot time evolution of spins
 .false.      ! if .true. reduce states to open plus a few closed channels
 4            ! Redimension number - must include empty states for non-zero current
-**********************************************************
-*********** END of INPUT FILE TimeESR.input **************
-**********************************************************
-@
-cat >H_QD.input <<@@
 *****************************************************************
-******** Please keep this FORMAT, including seperators **********
-*****************************************************************
-1                  ! Number of spins (molecules or sites)
-------------------- Spin properties: Spin 1 ---------------------
-0.5                ! First spin must be 0.5 for transport
-0 0 0 0            ! Stephen Coefficients: B20 B22 B40 B44
-0 0 1              ! Axis for Stephen Operators
-.60827625 0.0 0.0  ! Local magnetic field (T)
-2.0 2.0 2.0        ! Local gyromagnetic factors
-------------------- Exchange interactions -----------------------
-0                  ! Number of exchange connected pairs
-------------------- Electronic interactions ---------------------
--10.0              ! eps_QD electronic level (meV)
-100.0000           ! Hubbard U (meV)
-------------------- Output options ------------------------------
-Hamiltonian.output ! Name of the output file with H
-4                  ! Number of states to print in Spin_distribution.dat
-.true.             ! .true. Write pre-diagonalized Hamiltonian to PD_HAMIL.dat
-.true.             ! .true. Write all eigenvectors to EIGENVECT.dat
-*****************************************************************
-***************** END of INPUT FILE H_QD.input ******************
+*************** END of INPUT FILE TimeESR.input *****************
 *****************************************************************
 @@
 echo "Frequency (GHz)::" $i
@@ -90,5 +93,6 @@ cp POPULATIONS.dat POP$i.dat
 cp SpinDynamics.dat SP$i.dat
 done
 
+# Plot the results
 gnuplot SpectraESR.plot
 xdg-open SpectraESR.png &

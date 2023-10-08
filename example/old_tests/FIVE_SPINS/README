@@ -1,9 +1,0 @@
-DC calculation only (We put the driving to zero)
-
-This is a "complex example" of the transport channel coupled to a spin 1 that itself is coupled to another spin 1 which is coupled to a spin 1/2 and the first spin 1 is also coupled to a spin 1/2.
-
-It represents a radical porphyrin (Open Acess https://onlinelibrary.wiley.com/doi/full/10.1002/advs.202105906) but with two metallic centers (two Fe atoms, each with S=1).
-
-Since the number of atoms is larighs and the number of states is really large, we use the redimensioning of this version of the code to have something manageable.
-
- Nicolas Lorente, October 2022

@@ -43,6 +43,6 @@ ESR.dat     ! file DC current
 .true.      ! Plot time evolution of spins
 .true.      ! if .true. reduce states to open plus a few closed channels
 3           ! Redimension number - must include empty states for non-zero current
-**********************************************************
-*********** END of INPUT FILE TimeESR.input **************
-**********************************************************
+*****************************************************************
+*************** END of INPUT FILE TimeESR.input *****************
+*****************************************************************

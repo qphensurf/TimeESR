@@ -6,7 +6,7 @@ Enjoy! TimeESR team, October 8, 2023.
 The code is intended for computing ESR in an STM junction, where the driving is produced by the modulation of the electron hopping integrals. It models one electronic orbital coupled to a complex system of spins. It is intended for (i) obtaining continuous-wave ESR spectra (our Floquet code is better suited for this), (ii) doing quantum operations driving spins with short pulses, and (iii) using multiple driving frequencies as is done in state-of-the-art STM-ESR.
 
 ## Compilation Instructions
-1. Prerequisities: LAPACK, BLAS, Fortran compiler to run the program. Gnuplot, Python, xdg-open, and qutip are recommended if using the prodvided plot and movie scripts for any example in the `./example` folder. 
+1. Prerequisities: LAPACK, BLAS, Fortran compiler to run the program. Gnuplot, Python, xdg-open, and qutip are recommended if using the provided plot and movie scripts for any example in the `./example` folder. 
 2. Review `./src/make.sys` to make sure your compiler and compilation options are set properly. 
 3. Go to `./src` and execute `make`.
 

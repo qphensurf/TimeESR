@@ -218,6 +218,7 @@ CONTAINS
    complex (qc), allocatable :: matrix_out (:), rho (:,:,:), DC_pop (:), DC_rho (:,:)
    character ( len = 100 ) :: output_file, output_fourier, output_ESR
    logical :: population, density_matrix
+   real (q) :: sumrho
 
    if (population) then ! only if tag population is set to .true.
 ! Diagonal of density matrix or populations as a function of time
@@ -230,7 +231,11 @@ CONTAINS
       open (unit_output, file='POPULATIONS.dat')
 
       do i=1,Ntime
-      write(unit_output,*) time(i)*time_unit, (dble(rho(j,j,i)), j = 1, Ndim)
+      sumrho = 0._q
+      do j=1, Ndim
+         sumrho = sumrho + dble(rho(j,j,i))
+      enddo
+      write(unit_output,*) time(i)*time_unit, (dble(rho(j,j,i)), j = 1, Ndim), sumrho
       enddo
 
       close (unit_output)

@@ -210,7 +210,7 @@ CONTAINS
    integer :: Nfreq, Ninterval
    real (q) :: suma, sumb, weight, stept, period 
    real (q) :: time (:), curr (:), Freq_seq (:,:)
-   real (q) :: t1, t2, t3, DC_current
+   real (q) :: t1, t2, t3, DC_current, DC_current_test
    complex (qc) :: a (3,3)
    real (q), parameter :: pA = .662371573E10_q !a.u. to pA
    real (q), allocatable :: frequencies (:)
@@ -337,6 +337,7 @@ CONTAINS
          ! have consequence if the driving is not sinusoidal
          ! or the period is to long (when doing DC calculations...)
          ! Comment out just the max-min for sinusoidal currents
+         !     open (unit_output, file='dc_current_test.dat')
          !     p=5
          !     l=0
          !     allocate (array (p*indexperiod+1))
@@ -347,7 +348,9 @@ CONTAINS
          !     enddo
          !     DC_current= 0.5*(MAXVAL(array)+MINVAL(array))
          !     deallocate (array)
-         !
+         !     write (unit_output, *) DC_current_test*pA !picoAmp units
+         !     close (unit_output)
+         
          ! INSTEAD
          ! We apply general averaging over p periods
          p=20

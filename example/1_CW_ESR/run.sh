@@ -38,7 +38,7 @@ Hamiltonian.output ! Name of the output file with H
 @
 
 # Perform a DC simulation for a series of frequencies in order to produce a CW-ESR-like plot
-for i in `seq 16.9 0.01 17.1` 
+for i in `LC_ALL=C seq 16.9 0.01 17.1` 
 do
 cat >TimeESR.input <<@@
 *****************************************************************
@@ -94,5 +94,5 @@ cp SpinDynamics.dat SP$i.dat
 done
 
 # Plot the results
-gnuplot SpectraESR.plot
+python plot_SpectraESR.py SpectraESR.dat SpectraESR.png
 xdg-open SpectraESR.png &

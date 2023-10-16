@@ -70,7 +70,7 @@ Hamiltonian.output ! Name of the output file with H
 @
 
 # Perform a DC simulation for a series of negative frequencies in order to produce a CW-ESR-like plot
-for i in `seq 15. -0.5 0.5`
+for i in `LC_ALL=C seq 15. -0.5 0.5`
 do
 cat >TimeESR.input <<@@
 *****************************************************************
@@ -127,7 +127,7 @@ cp SpinDynamics.dat SPn$i.dat
 done
 
 # Do the same for the positive frequencies
-for i in `seq 0.5 0.5 15`
+for i in `LC_ALL=C seq 0.5 0.5 15`
 do 
 cat >TimeESR.input <<@@@
 *****************************************************************
@@ -184,7 +184,6 @@ cp SpinDynamics.dat SP$i.dat
 done
 
 # Plot the results
-gnuplot CurrentESR.plot
+python plot_CurrentESR.py Current_DC.dat CurrentESR.png
 xdg-open CurrentESR.png &
-
 

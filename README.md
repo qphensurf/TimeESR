@@ -1,6 +1,6 @@
 # TimeESR v1.0.1
 An STM-ESR code solving a QME in the time domain. TimeESR is given as is and subject to gnu 3.0 CopyLeft. 
-Enjoy! TimeESR team, October 8, 2023.
+Enjoy! TimeESR team, October 19, 2023.
 
 ## Intended Use
 The code is intended for computing ESR in an STM junction, where the driving is produced by the modulation of the electron hopping integrals. It models one electronic orbital coupled to a complex system of spins. It is intended for (i) obtaining continuous-wave ESR spectra (our Floquet code is better suited for this), (ii) doing quantum operations driving spins with short pulses, and (iii) using multiple driving frequencies as is done in state-of-the-art STM-ESR.
@@ -15,12 +15,12 @@ The directory `./example` contains a few examples to get started. For each, exec
 
 ## Input Files
 For both input files, see the provided examples for descriptions of each option.
-1. `H_QD.input`: Descriptors for the Hamiltonian, with the first spin is a driven s=1/2 electron. The first site has four states: single-occupied up spin z direction, single-occupied down spin z direction, zero occupation, and double occupation. Other interactions, such as additional spins possessing magnetic anisotropies, local magnetic fields, and pair-exchange interactions, can be added.
+1. `H_QD.input`: Descriptors for the Hamiltonian, with the first spin is a driven $S=1/2$ electron. The first site has four states: single-occupied up spin $z$ direction, single-occupied down spin $z$ direction, zero occupation, and double occupation. Other interactions, such as additional spins possessing magnetic anisotropies, local magnetic fields, and pair-exchange interactions, can be added.
 2. `TimeESR.input`: Options for the QME-related subroutines which generate the time-depenedent outputs.
 
 ## Output Files
 After running the code, if one enables default output options, the following output files will be generated. 
-Note: for reported eigenvectors and Hamiltonians, components are given in pairs of re(V) im(V). Components are ordered by the origional occupation basis unless truncated: [up], [down], [0], [2]. For more than one spin, the basis is ordered by the tensor product. For example, for two spin 1/2 objects (where the first is the driven electron site) the order of the basis is [up up], [up down], [down up], [down down], [0 up], [0 down], [2 up], [2 down].
+Note: for reported eigenvectors $\bf{V}$ and Hamiltonians, components are given in pairs of $\Re(\bf{V})$ $\Im(\bf{V})$. Components are ordered by the origional occupation basis unless truncated: $\ket{\uparrow}$, $\ket{\downarrow}$, $\ket{\emptyset}$, $\ket{2}$. For more than one spin, the basis is ordered by the tensor product. For example, for two spin 1/2 objects (where the first is the driven electron site) the order of the basis is $\ket{\uparrow\uparrow}$, $\ket{\uparrow\downarrow}$, $\ket{\downarrow\uparrow}$, $\ket{\downarrow\downarrow}$, $\ket{\emptyset\uparrow}$, $\ket{\emptyset\downarrow}$, $\ket{2 \uparrow}$, $\ket{2 \downarrow}$.
 1. `C.dat`: Current (pA) as a function of time (ns)
 2. `EIGENVECT.dat`: Eigenvectors, listed in order of energy (GHz) reported by diagonalization and relative energy to ground state
 3. `ESR.dat`: DC "measured" current (pA), which uses an averaging scheme to determine the value
@@ -30,8 +30,8 @@ Note: for reported eigenvectors and Hamiltonians, components are given in pairs 
 7. `POP_AVE.dat`: DC "measured" populations, which uses an averaging scheme to determine the value
 8. `POPULATIONS.dat`: Populations (diagonal elements) of the density matrix as a function of time (ns). The data format is: time, rho_11, rho_22., etc.
 9. `RHO.dat`: Full density matrix
-10. `Spin_distribution.dat`: Average spin values <S_i> for each direction i for each eigenstate. A list of excitation energies (in GHZ, and meV), the value of the S² operator in units of hbar, and the corresponding s quantum number for each state is also given.
-11. `SpinDynamics.dat`: Several spin components as a function of time (ns). The data format is: time, (Sx, Sy, Sz) for site 1, (Sx, Sy, Sz) for site 2, etc. until site N, spin2, sqrt(sqrt(1+4*spin2)-1), trace of the real part of the density matrix
+10. `Spin_distribution.dat`: Average spin values $\langle S_i \rangle$, for each direction $i$, for each eigenstate. A list of excitation energies (in GHZ, and meV), the value of the $S^2$ operator in units of $\hbar$, and the corresponding s quantum number for each state is also given.
+11. `SpinDynamics.dat`: Several spin components as a function of time (ns). The data format is: time, ($S^x_i$, $S^y_i$, $S^z_i$) for site 1, ($S^x_i$, $S^y_i$, $S^z_i$) for site 2, etc. until site N, $S^{2}$, $\sqrt(\sqrt(1+4S^{2})-1)$, trace of the real part of the density matrix
 
 ## Troubleshooting Tips
 - The total duration of the running interval must correspond to the sum of all intervals of all pulses

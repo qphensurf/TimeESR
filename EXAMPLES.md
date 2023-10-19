@@ -13,7 +13,7 @@ Similar to the above example, but for a range of time points. This example shows
 Similar to the above example, but for a range of total propegation times. This example shows the insensitivity of the total end time provided that a fine enough differential time step is chosen (here, 1000 time points per ns).
 
 ## 5_ONE_SPIN_ON_RESONANCE
-Driving a spin 1/2 transport site from the prepared $\ket{0}$ state, taken to be the ground state with an applied $B$ field in the $\hat{x}$ direction with strength 0.60827625 T (i.e., a $\ket{\downarrow}$ state in the $x$ basis) at the appropriate frequency. This results in oscillations between the $ket{0}$ and $ket{1}$ state. The calculated driving frequency is 17.02717787 GHz for this operation.
+Driving a spin 1/2 transport site from the prepared $\ket{0}$ state, taken to be the ground state with an applied $B$ field in the $\hat{x}$ direction with strength 0.60827625 T (i.e., a $\ket{\downarrow}$ state in the $x$ basis) at the appropriate frequency. This results in oscillations between the $\ket{0}$ and $\ket{1}$ state. The calculated driving frequency is 17.02717787 GHz for this operation.
 
 ## 6_ONE_SPIN_PULSE
 Driving a spin 1/2 transport site from the prepared $\ket{0}$ state, taken to be the ground state with an applied $B$ field in the $\hat{x}$ direction with strength 0.5 T (i.e., a $\ket{\downarrow}$ state in the $x$ basis), to $(\ket{0} + \ket{1})/\sqrt{2}$ state, i.e., a Hadamard operation on a single spin 1/2 qubit. The calculated driving frequency is 13.9953 GHz for this operation. A rotating frame of reference is used in the post-processing step to remove the inherent larmor frequency of the system, and the system slowly decoheres after reaching the final state.

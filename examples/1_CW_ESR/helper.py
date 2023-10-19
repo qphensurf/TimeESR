@@ -36,7 +36,7 @@ def plot_2d( ax_obj, x, y, xfact=1, yfact=1, swapxy=False, linewidth=1.5, marker
 def plot_esr( datafile='SpectraESR.dat', savename='SpectraESR.png', freq_diff=None):
    
    xlabel = r'Frequency (GHz)'
-   ylabel = r'Current (pA)'
+   ylabel = r'DC Current (pA)'
    xfact = 1
    yfact = 1
    

@@ -9,11 +9,11 @@ print_dpi = 1200
 fig_width_inches = 3.4
 fig_height_inches = 3.4
 
-def get_dc_data( filename='Current_DC.dat' ):
+def get_dc_data( filename='SpectraESR.dat' ):
    dat = np.loadtxt( filename )
    return dat
 
-def plot_2d( ax_obj, x, y, xfact=1, yfact=1, swapxy=False, linewidth=1.5, marker='', color='k', label='', xlim=None, ylim=None ):
+def plot_2d( ax_obj, x, y, xfact=1, yfact=1, swapxy=False, linewidth=1.5, marker='', color='k', label='', xlim=None, ylim=None, name=None ):
    # limits are in the form [min, max, diff]   
 
    if swapxy:
@@ -31,12 +31,12 @@ def plot_2d( ax_obj, x, y, xfact=1, yfact=1, swapxy=False, linewidth=1.5, marker
       ax_obj.set_ylim(ylim[0],ylim[1])
       ax_obj.set_yticks(ticks)
 
-   ax_obj.plot( xplot, yplot, linewidth=linewidth, marker=marker )
+   ax_obj.plot( xplot, yplot, linewidth=linewidth, marker=marker, label=name )
 
-def plot_esr( datafile='Current_DC.dat', savename='CurrentESR.png', bias_diff=None):
+def plot_esr_compare( datafiles=['rough/SpectraESR.dat','fine/SpectraESR.dat'], savename='SpectraESR.png', names=['rough','fine'], freq_diff=None):
    
-   xlabel = r'Bias (meV)'
-   ylabel = r'Current (pA)'
+   xlabel = r'Frequency (GHz)'
+   ylabel = r'DC Current (pA)'
    xfact = 1
    yfact = 1
    
@@ -45,6 +45,9 @@ def plot_esr( datafile='Current_DC.dat', savename='CurrentESR.png', bias_diff=No
    plt.rcParams['figure.figsize'] = (fig_width_inches, fig_height_inches)
    plt.rcParams['figure.dpi'] = dpi
 
+   prop_cycle = plt.rcParams['axes.prop_cycle']
+   colors = prop_cycle.by_key()['color']
+
    fig, ax = plt.subplots()
    fig.set_size_inches( fig_width_inches, fig_height_inches)
    fig.set_dpi(dpi)
@@ -52,16 +55,21 @@ def plot_esr( datafile='Current_DC.dat', savename='CurrentESR.png', bias_diff=No
    ax.set_xlabel(xlabel, fontsize=fontsize)
    ax.set_ylabel(ylabel, fontsize=fontsize)
    
-   esr_dat = get_dc_data( filename=datafile ) 
-   bias = esr_dat[:,0]
-   current = esr_dat[:,1]
-   xmin = bias[0] 
-   xmax = bias[-1]
-   if bias_diff:
-      xdiff = bias_diff
-   else:
-      xdiff = bias[1] - bias[0]
-   plot_2d( ax, bias, current, xfact=xfact, yfact=yfact, xlim=[xmin,xmax,xdiff], marker='.' )
+   esr_data = {}
+   freq = {}
+   current = {}
+   for i, file in enumerate(datafiles):
+      esr_data[file] = get_dc_data( filename=file ) 
+      freq[file] = esr_data[file][:,0]
+      current[file] = esr_data[file][:,1]
+      xmin = freq[file][0] 
+      xmax = freq[file][-1]
+      if freq_diff:
+         xdiff = freq_diff
+      else:
+         xdiff = freq[file][1] - freq[file][0]
+      plot_2d( ax, freq[file], current[file], xfact=xfact, yfact=yfact, xlim=[xmin,xmax,xdiff], marker='.', color=colors[i], name=names[i] )
+   ax.legend(frameon=False)
    plt.tight_layout()
    plt.savefig( savename, bbox_inches='tight', dpi=print_dpi)
 

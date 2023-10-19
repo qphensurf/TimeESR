@@ -1,4 +1,4 @@
 #!/bin/bash
 
-rm -rf rough fine __*
+rm -rf 0.* __*
 rm -f *.png

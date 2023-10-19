@@ -36,7 +36,7 @@ def plot_2d( ax_obj, x, y, xfact=1, yfact=1, swapxy=False, linewidth=1.5, marker
 def plot_esr_compare( datafiles=['rough/SpectraESR.dat','fine/SpectraESR.dat'], savename='SpectraESR.png', names=['rough','fine'], freq_diff=None):
    
    xlabel = r'Frequency (GHz)'
-   ylabel = r'Current (pA)'
+   ylabel = r'DC Current (pA)'
    xfact = 1
    yfact = 1
    
@@ -58,17 +58,29 @@ def plot_esr_compare( datafiles=['rough/SpectraESR.dat','fine/SpectraESR.dat'], 
    esr_data = {}
    freq = {}
    current = {}
+   xmin_glb = 0.
+   xmax_glb = 0.
+   xdiff_glb = 0.
    for i, file in enumerate(datafiles):
       esr_data[file] = get_dc_data( filename=file ) 
       freq[file] = esr_data[file][:,0]
       current[file] = esr_data[file][:,1]
       xmin = freq[file][0] 
       xmax = freq[file][-1]
+      if i == 0:
+         xmin_glb = xmin
+      if xmin < xmin_glb:
+         xmin_glb = xmin
+      if xmax > xmax_glb:
+         xmax_glb = xmax
       if freq_diff:
          xdiff = freq_diff
+         xdiff_glb = freq_diff
       else:
          xdiff = freq[file][1] - freq[file][0]
-      plot_2d( ax, freq[file], current[file], xfact=xfact, yfact=yfact, xlim=[xmin,xmax,xdiff], marker='.', color=colors[i], name=names[i] )
+         if xdiff < xdiff_glb:
+            xdiff_glb = xdiff
+      plot_2d( ax, freq[file], current[file], xfact=xfact, yfact=yfact, xlim=[xmin_glb,xmax_glb,xdiff_glb], marker='.', color=colors[i], name=names[i] )
    ax.legend(frameon=False)
    plt.tight_layout()
    plt.savefig( savename, bbox_inches='tight', dpi=print_dpi)

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+freqstart=16.8
+freqend=17.2
+freqdiff=0.04
+
 rundir=$(pwd)
 progdir="../../src"
 ./clean.sh
@@ -38,7 +42,7 @@ Hamiltonian.output ! Name of the output file with H
 @
 
 # Perform a DC simulation for a series of frequencies in order to produce a CW-ESR-like plot
-for i in `LC_ALL=C seq 16.9 0.01 17.1` 
+for freq in `LC_ALL=C seq $freqstart $freqdiff $freqend`
 do
 cat >TimeESR.input <<@@
 *****************************************************************
@@ -51,7 +55,7 @@ cat >TimeESR.input <<@@
 1            ! Maximum number of frequencies
 0.0   150.0  ! 1 - times for pulse (ns)
 1.0          ! 1 - F1 amplitude
-$i           ! 1 - F1 pulse frequency (GHz)
+$freq        ! 1 - F1 pulse frequency (GHz)
 0.0          ! 1 - phase shift (radians)
 ---------------electrode set-up-----------------------------------
 0.0020       ! gamma_R_0= 2*pi*W_R_0*W_R_0*rho (meV)
@@ -86,11 +90,11 @@ ESR.dat      ! file DC current
 *************** END of INPUT FILE TimeESR.input *****************
 *****************************************************************
 @@
-echo "Frequency (GHz)::" $i
+echo "Frequency (GHz)::" $freq
 $progdir/TimeESR.x
-E=`tail -1 ESR.dat` ; echo $i $E >> SpectraESR.dat
-cp POPULATIONS.dat POP$i.dat
-cp SpinDynamics.dat SP$i.dat
+E=`tail -1 ESR.dat` ; echo $freq $E >> SpectraESR.dat
+cp POPULATIONS.dat POP$freq.dat
+cp SpinDynamics.dat SP$freq.dat
 done
 
 # Plot the results

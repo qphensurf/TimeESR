@@ -9,7 +9,7 @@ Similar to the above example, covering a driving frequency range between 16.8 to
 ## 3_CW_ESR_RESOL_TIME
 Similar to the above example, but for a range of time points. This example shows the importance of choosing a fine enough time step.
 
-## 4_CW_ESR_RESOL_TIME
+## 4_CW_ESR_TOTAL_TIME
 Similar to the above example, but for a range of total propegation times. This example shows the insensitivity of the total end time provided that a fine enough differential time step is chosen (here, 1000 time points per ns).
 
 ## 5_ONE_SPIN

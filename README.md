@@ -11,7 +11,7 @@ The code is intended for computing ESR in an STM junction, where the driving is 
 3. Go to `./src` and execute `make`.
 
 ## Examples
-The directory `./example` contains a few examples to get started. For each, execute `./run.sh` in the example directory, which cleans the `./src` folder, makes the TimeESR exectuible, runs the program, and then makes plots. Output plots can include population of states, spin projections, and current as a function of time. Post-processed plots of representative Bloch spheres, and movies of appropriate Bloch sphere projections as a function of time, are created for some examples. A full description of examples can be found in `Example.md`.
+The directory `./example` contains a few examples to get started. For each, execute `./run.sh` in the example directory, which cleans the `./src` folder, makes the TimeESR exectuible, runs the program, and then makes plots. Output plots can include population of states, spin projections, and current as a function of time. Post-processed plots of representative Bloch spheres, and movies of appropriate Bloch sphere projections as a function of time, are created for some examples. A full description of examples can be found in `Examples.md`.
 
 ## Input Files
 For both input files, see the provided examples for descriptions of each option.

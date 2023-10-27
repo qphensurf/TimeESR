@@ -7,8 +7,8 @@ program TimeESR
 !
 ! gnu licence 3.0 (c) J. Reina Galvez, E. D. Switzer, C. Wolf & N. Lorente
 !
-!  Release version 1.0.0
-!  2023 February 24
+!  Release version 1.0.1
+!  2023 October 7
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !This is the main file and calls in:

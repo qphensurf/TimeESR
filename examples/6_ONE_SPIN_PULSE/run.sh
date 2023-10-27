@@ -1,7 +1,7 @@
 #!/bin/bash
 
 rundir=$(pwd)
-progdir="/home/qns/Research/TimESR/Release/src"
+progdir="../../src"
 ./clean.sh
 
 cd $progdir
@@ -15,10 +15,12 @@ gnuplot POPULATIONS.plot
 gnuplot SPIN.plot
 gnuplot CURRENT.plot
 
-xdg-open Populations_1-4.png &
+xdg-open Populations_1-3.png &
 xdg-open SPINx.png &
 xdg-open SPINy.png &
 xdg-open SPINz.png &
 xdg-open Current.png &
 
 python bloch_sphere.py
+xdg-open bloch_sphere.png &
+xdg-open bloch_movie.mp4 &

@@ -18,7 +18,7 @@ CONTAINS
       CHARACTER(LEN=*), INTENT(IN) :: code
       CHARACTER(LEN=80) :: code_version, version_number
 
-      version_number = '1.0.0'
+      version_number = '1.0.1'
       code_version = TRIM(code) // " v." // TRIM(version_number)
 
       CALL opening_message(code_version)

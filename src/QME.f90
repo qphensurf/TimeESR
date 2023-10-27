@@ -39,17 +39,17 @@ CONTAINS
       
 ! Right electrode
       
-      g0p_up = gamma_R_0*fermiR*(1+Spin_polarization_R)*0.5
-      g0m_up = gamma_R_0*ufermiR*(1+Spin_polarization_R)*0.5
-      g0p_dn = gamma_R_0*fermiR*(1-Spin_polarization_R)*0.5
-      g0m_dn = gamma_R_0*ufermiR*(1-Spin_polarization_R)*0.5
+      g0p_up = gamma_R_0*fermiR*(1._q+Spin_polarization_R)*0.5_q
+      g0m_up = gamma_R_0*ufermiR*(1._q+Spin_polarization_R)*0.5_q
+      g0p_dn = gamma_R_0*fermiR*(1._q-Spin_polarization_R)*0.5_q
+      g0m_dn = gamma_R_0*ufermiR*(1._q-Spin_polarization_R)*0.5_q
 
 ! Left electrode
 
-      g1p_up = gamma_L_0*fermiL*(1+Spin_polarization_L)*0.5
-      g1m_up = gamma_L_0*ufermiL*(1+Spin_polarization_L)*0.5
-      g1p_dn = gamma_L_0*fermiL*(1-Spin_polarization_L)*0.5
-      g1m_dn = gamma_L_0*ufermiL*(1-Spin_polarization_L)*0.5
+      g1p_up = gamma_L_0*fermiL*(1._q+Spin_polarization_L)*0.5_q
+      g1m_up = gamma_L_0*ufermiL*(1._q+Spin_polarization_L)*0.5_q
+      g1p_dn = gamma_L_0*fermiL*(1._q-Spin_polarization_L)*0.5_q
+      g1m_dn = gamma_L_0*ufermiL*(1._q-Spin_polarization_L)*0.5_q
 
 
         do v=1,Ndim
@@ -60,7 +60,7 @@ CONTAINS
                     lambda (j,u,2)*conjg(lambda(l,v,2))*g0m_dn
 
 ! Right electrode
-            G (v,l,j,u,1,n) = 0.5*(Lvluj + Ljulv)
+            G (v,l,j,u,1,n) = 0.5_q*(Lvluj + Ljulv)
 
             Lvluj = lambda (v,l,1)*conjg(lambda(u,j,1))*g1p_up+  &
                     lambda (v,l,2)*conjg(lambda(u,j,2))*g1p_dn
@@ -68,7 +68,7 @@ CONTAINS
                     lambda (j,u,2)*conjg(lambda(l,v,2))*g1m_dn
 
 ! Left electrode
-            G (v,l,j,u,2,n) = 0.5*(Lvluj + Ljulv)
+            G (v,l,j,u,2,n) = 0.5_q*(Lvluj + Ljulv)
             
             !if(write_rates) write(666,*) v, l, j, u, n, G(v,l,j,u,1,n)*Hartree/GHz, G(v,l,j,u,2,n)*Hartree/GHz
         enddo
@@ -127,16 +127,16 @@ CONTAINS
       
 
 !Right electrode
-      g0pa_up = Electrode*gamma_R_0*fermiR*(1+Spin_polarization_R)*0.5
-      g0ma_up = Electrode*gamma_R_0*ufermiR*(1+Spin_polarization_R)*0.5
-      g0pa_dn = Electrode*gamma_R_0*fermiR*(1-Spin_polarization_R)*0.5
-      g0ma_dn = Electrode*gamma_R_0*ufermiR*(1-Spin_polarization_R)*0.5
+      g0pa_up = Electrode*gamma_R_0*fermiR*(1._q+Spin_polarization_R)*0.5_q
+      g0ma_up = Electrode*gamma_R_0*ufermiR*(1._q+Spin_polarization_R)*0.5_q
+      g0pa_dn = Electrode*gamma_R_0*fermiR*(1._q-Spin_polarization_R)*0.5_q
+      g0ma_dn = Electrode*gamma_R_0*ufermiR*(1._q-Spin_polarization_R)*0.5_q
 
 ! Left electrode
-     g1pa_up = (1-Electrode)*gamma_L_0*fermiL*(1+Spin_polarization_L)*0.5
-     g1ma_up = (1-Electrode)*gamma_L_0*ufermiL*(1+Spin_polarization_L)*0.5
-     g1pa_dn = (1-Electrode)*gamma_L_0*fermiL*(1-Spin_polarization_L)*0.5
-     g1ma_dn = (1-Electrode)*gamma_L_0*ufermiL*(1-Spin_polarization_L)*0.5
+     g1pa_up = (1-Electrode)*gamma_L_0*fermiL*(1._q+Spin_polarization_L)*0.5_q
+     g1ma_up = (1-Electrode)*gamma_L_0*ufermiL*(1._q+Spin_polarization_L)*0.5_q
+     g1pa_dn = (1-Electrode)*gamma_L_0*fermiL*(1._q-Spin_polarization_L)*0.5_q
+     g1ma_dn = (1-Electrode)*gamma_L_0*ufermiL*(1._q-Spin_polarization_L)*0.5_q
 
         do v=1,Ndim
         do l=1,Ndim
@@ -147,7 +147,7 @@ CONTAINS
             Ljulva = lambda (j,u,1)*conjg(lambda(l,v,1))*g0ma_up+  &
                     lambda (j,u,2)*conjg(lambda(l,v,2))*g0ma_dn
 
-            GC (v,l,j,u,n) = 0.5*(Lvluja - Ljulva)
+            GC (v,l,j,u,n) = 0.5_q*(Lvluja - Ljulva)
 
 ! Left electrode
             Lvluja = lambda (v,l,1)*conjg(lambda(u,j,1))*g1pa_up+  &
@@ -156,7 +156,7 @@ CONTAINS
                     lambda (j,u,2)*conjg(lambda(l,v,2))*g1ma_dn
               
               
-            GC (v,l,j,u,n) = GC (v,l,j,u,n) + 0.5*(Lvluja - Ljulva) ! This has the right admixture of electrodes
+            GC (v,l,j,u,n) = GC (v,l,j,u,n) + 0.5_q*(Lvluja - Ljulva) ! This has the right admixture of electrodes
 
 
         enddo
@@ -177,30 +177,71 @@ CONTAINS
      real (q), intent (in) :: Temperature
      real (q), intent (in) :: Eigenvalues (:)
      complex (qc), allocatable, intent (out) :: rho (:,:,:)
-     real (q) :: Z
+     real (q) :: Z, expval, maxarg, ln_val, sum_exp
+     real (q), allocatable :: arg(:)
      integer :: i
+     logical, allocatable :: truncate_flag(:)
+     logical :: report_truncate
+
+     ! Overflow and underflow errors are common in calculation of partition functions
+     ! so we utilize a log sum exp (LSE) trick which is commonly used in data science
 
      allocate (rho (Ndim, Ndim, Ntime))
-
-     Z = 0._q; rho = zero
-
-     do i =1, Ndim
+     allocate(arg(size(Eigenvalues)))
+     allocate(truncate_flag(size(Eigenvalues)))
      
+     Z = 0._q; rho = zero;
+     truncate_flag = .FALSE.
+     report_truncate = .FALSE.
+     arg = 0._q
+   
+     ! LSE: Get exponential arguments
+     do i=1, Ndim 
+      arg(i) = -(Eigenvalues(i)-Eigenvalues(1))/Temperature 
+
+        ! Checking for underflow errors
+        if ( arg(i) < log(tiny(1.0_q)) ) then
+          truncate_flag(i) = .TRUE.
+          report_truncate = .TRUE.
+        end if
+     end do
      
-#ifdef __UNDERANDOVER
-     ! Underflow errors possible here
-     if (abs(exp( - (Eigenvalues (i)-Eigenvalues (1))/Temperature )) < tiny(0.0_q)) then
-       write(*,*) "Tiny values found for eigenvalue diff (integer, value): ", i, Eigenvalues (i)-Eigenvalues (1)
-       write(*,*) "Temperature: ",Temperature
-       write(*,*) "Value: ", exp( - (Eigenvalues (i)-Eigenvalues (1))/Temperature )
+     if(report_truncate) then
+      
+       write(*,*) "Large negative exponential argument(s) found for initial population calculation"
+       write(*,*) "The exponent of this argument will be truncated to zero"
+       write(*,*) "(state number, eigenvalue, temperature, exp argument, &
+          & and largest negative exponent argument allowed):"
+       do i=1, Ndim
+         if (truncate_flag(i)) then
+            write(*,*) i, Eigenvalues(i)-Eigenvalues(1), Temperature, arg(i), log(tiny(1.0_q))
+         end if
+       end do
+       
      end if
-#endif
-     Z = Z + exp ( - (Eigenvalues (i)-Eigenvalues (1))/Temperature )
-     enddo
 
+     ! LSE: Find maximum value
+     maxarg = maxval(arg)
+     
+     ! LSE: Sum up all exponentials
+     sum_exp = 0._q 
+     do i =1, Ndim
+      if ( arg(i) .ge. log(tiny(1.0_q))) then
+         sum_exp = sum_exp + exp(arg(i) - maxarg)
+      end if
+     end do
+     
+     ! LSE: Log that sum, and add back the maximum amount that was removed
+     ln_val = maxarg + log(sum_exp)
+     
+     ! Get Z from LSE
+     Z = exp(ln_val)
 
+     ! Now do the populations
      do i = 1, Ndim
-     rho (i,i,1) = rho (i,i,1) + exp ( - (Eigenvalues (i)-Eigenvalues (1))/Temperature )/Z
+      if ( arg(i) .ge. log(tiny(1.0_q)) ) then
+         rho (i,i,1) = rho (i,i,1) + exp ( arg(i) )/Z
+      end if
      enddo
 
 !      write(*,*) Temperature, Z,Eigenvalues
@@ -210,6 +251,8 @@ CONTAINS
 !         write(*,*) (rho(i,j,1),j=1,ndim)
 !         write(*,*)  
 !      enddo
+
+     deallocate(arg)
      
      return
 
@@ -253,6 +296,7 @@ CONTAINS
      integer :: n, l, j, i, u, v, m, nb
      real (q) :: half
      complex (qc), allocatable :: k1(:), k2(:), k3(:), k4(:), D(:), P(:)
+     logical :: print_flag
 
       
      allocate (k1(Ndim*Ndim), k2(Ndim*Ndim), k3(Ndim*Ndim), k4(Ndim*Ndim))
@@ -265,12 +309,13 @@ CONTAINS
      allocate (ufermiL_a(Ndim,Ndim,Nbias))
 
 ! Bias intergal
+     print_flag = .TRUE.
      do n = 1, Nbias
 ! I11 and I21 from the Manual are honored here:
      do j=1,Ndim
      do u=1,Ndim
-      call ExtendedFermiIntegral ( Delta (j,u), bias_R (n), Temperature, Cutoff, GammaC, N_int, fermiR)
-      call ExtendedFermiIntegral ( Delta (j,u), bias_L (n), Temperature, Cutoff, GammaC, N_int,  fermiL)
+      call ExtendedFermiIntegral ( Delta (j,u), bias_R (n), Temperature, Cutoff, GammaC, N_int, fermiR, n, j, u, 'R', print_flag )
+      call ExtendedFermiIntegral ( Delta (j,u), bias_L (n), Temperature, Cutoff, GammaC, N_int,  fermiL, n, j, u, 'L', print_flag )
       call ExtendeduFermiIntegral ( Delta (j,u), bias_R (n), Temperature, Cutoff, GammaC, N_int, ufermiR)
       call ExtendeduFermiIntegral ( Delta (j,u), bias_L (n), Temperature, Cutoff, GammaC, N_int,  ufermiL)
 !The idea is to create an array and pass it to the rates routine
@@ -336,7 +381,7 @@ CONTAINS
        call matrix_rate (D, G, Delta, P, half)
        k1 = stept*P
 
-       D = D + 0.5*k1
+       D = D + 0.5_q*k1
        half = 0.5_q
        call matrix_rate (D, G, Delta, P, half)
        k2 = stept*P
@@ -349,7 +394,7 @@ CONTAINS
        enddo
        enddo
 
-       D = D + 0.5*k2
+       D = D + 0.5_q*k2
        half = 0.5_q
        call matrix_rate (D, G, Delta, P, half)
        k3 = stept*P
@@ -477,51 +522,83 @@ CONTAINS
       
       beta = 1._q / T
       Fermi = beta * e
-      if (e < -1000._q) then
-      	Fermi = 0._q
-      else
-#ifdef __UNDERANDOVER
-     ! Overflow errors possible here
-     if (exp(Fermi) > huge(0.0_q)) then
-       write(*,*) "Large Fermi value found for energy, temperature, value: ",e,T,exp(Fermi)
-     end if
+      
+      ! Take care of underflow and overflow errors here, which can occur within some distance from tiny and huge
+      if(Fermi-4._q .lt. log(tiny(1._q))) then
+#ifdef __DEBUG
+         write(*,*) "Large negative beta*energy value found"
+         write(*,*) "(beta, energy, beta*energy, largest negative value allowed):"
+         write(*,*) beta, e, Fermi, log(tiny(1._q))
+         write(*,*) "Fermi function will default to the value of 1"
 #endif
-        Fermi = exp(Fermi)
+         Fermi = 1._q
+      elseif (Fermi+4._q .gt. log(huge(1._q))) then
+#ifdef __DEBUG
+         write(*,*) "Large positive beta*energy value found"
+         write(*,*) "(beta, energy, beta*energy, largest positive value allowed):"
+         write(*,*) beta, e, Fermi, log(huge(1._q))
+         write(*,*) "Fermi function will default to the value of 0"
+#endif
+         Fermi = 0._q
+      else
+         Fermi = 1._q/(1._q + exp(Fermi))
       end if
       
-      if (fermi > 1.0e30_q) then
-        Fermi = 0._q
-      else
-        Fermi = 1._q/(1._q + Fermi)
-      end if
     end function
 
 
 ! Calculation of energy integration of rates involving the Fermi function
-      subroutine ExtendedFermiIntegral ( D, V, T, Cutoff, GammaC, N,  fermiA)
+      subroutine ExtendedFermiIntegral ( D, V, T, Cutoff, GammaC, N,  fermiA, i_n, i_j, i_u, bias_dir, print_flag )
       implicit none
       real (q) :: D, V, T, Cutoff, GammaC
       real (q) :: e, step_e
       integer :: i, N
       complex (qc):: fermiA
+      logical :: truncate_flag
+      integer :: i_n, i_j, i_u
+      character(len=*) :: bias_dir
+      logical :: print_flag
 !fermiA is Integral I11 of the Manual
 ! Trapeze-integration (the best among the better)
 
-      step_e = 2*Cutoff/(N-1)
-      e= -Cutoff
-      fermiA=0.5*Fermi (e-V, T) / (e-D+ui*GammaC)
+      step_e = 2._q*Cutoff/(N-1._q)
+      e = -Cutoff
+      fermiA = 0.5_q*Fermi(e-V,T) / (e - D + ui*GammaC)
+      truncate_flag = .FALSE.
       
       do i = 2, N-1
-      e= -Cutoff + (i-1)*step_e
-      fermiA=fermiA+Fermi (e-V, T) / (e-D+ui*GammaC)
+         e= -Cutoff + (i-1._q)*step_e       
+         
+         ! Found an issue with dividing a small e-D quantity into a very small Fermi
+         ! By including GammaC, Fortran performs a multiplication of the numerator by
+         ! (e-D,-GammaC) and the denominator becomes |(e-D,GammaC)|^2. The first step
+         ! may underflow the real register, and so we handle it the best we can.
+         if(Fermi(e-V,T) .ne. 0._q) then
+            if((log(Fermi(e-V,T)) + log(abs(e-D)))-6._q .ge. log(tiny(1._q))) then
+               fermiA = fermiA + Fermi(e-V,T) / (e - D + ui*GammaC)
+            else
+               truncate_flag = .TRUE.
+            end if
+         end if
+        
       enddo
+      
+      if(truncate_flag) then
+         if (print_flag) then
+            write(*,*) "Truncated ExtendedFermiIntegral, &
+                        for bias direction, number, and state combination: "
+            print_flag = .FALSE.
+         end if
+         write(*,*) trim(bias_dir), i_n, i_j, i_u
+      end if
+      
       e = Cutoff
-      fermiA=fermiA+0.5*Fermi (e-V, T) / (e-D+ui*GammaC)
-
+      fermiA = fermiA + 0.5_q*Fermi(e-V,T) / (e - D + ui*GammaC)
       fermiA = step_e*ui*fermiA
 
       return
       end subroutine ExtendedFermiIntegral
+      
 ! Calculation of energy integration of rates involving 1-Fermi function
       subroutine ExtendeduFermiIntegral ( D, V,  T, Cutoff, GammaC, N, ufermiA)
       implicit none
@@ -532,16 +609,16 @@ CONTAINS
 !ufermiA is Integral I21 of the Manual
 ! Trapeze-integration (the best among the better)
 
-      step_e = 2*Cutoff/(N-1)
+      step_e = 2._q*Cutoff/(N-1._q)
       e= -Cutoff 
-      ufermiA=0.5*(1-Fermi (e-V, T)) / (e+D-ui*GammaC)
+      ufermiA=0.5_q*(1._q-Fermi (e-V, T)) / (e+D-ui*GammaC)
 
       do i = 2, N-1
-      e= -Cutoff + (i-1)*step_e
-      ufermiA=ufermiA+(1-Fermi (e-V, T)) / (e+D-ui*GammaC)
+      e= -Cutoff + (i-1._q)*step_e
+      ufermiA=ufermiA+(1._q-Fermi (e-V, T)) / (e+D-ui*GammaC)
       enddo
       e = Cutoff
-      ufermiA=ufermiA+0.5*(1-Fermi (e-V, T)) / (e+D-ui*GammaC)
+      ufermiA=ufermiA+0.5_q*(1._q-Fermi (e-V, T)) / (e+D-ui*GammaC)
 
       ufermiA = -step_e*ui*ufermiA
 

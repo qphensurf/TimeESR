@@ -55,13 +55,12 @@ CONTAINS
         enddo
 
 
-
          do l = 1, Ndim
          do u = 1, Ndim
          do j = 1, Ndim
       curr (i) = curr (i) +    &
             real(rho (l,u,i)*GC(l,j,j,u,np)+conjg(rho (l,u,i)*GC(l,j,j,u,np)))*  &
-            (1+Pulse*((1-Electrode)*gamma_L_1/gamma_L_0+Electrode*gamma_R_1/gamma_R_0))
+            (1._q+Pulse*((1-Electrode)*gamma_L_1/gamma_L_0+Electrode*gamma_R_1/gamma_R_0))
          enddo
          enddo
          enddo

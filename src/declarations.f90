@@ -16,12 +16,22 @@ module declarations
   real (q), parameter :: sqr8=2.82842712474619009760_q
   real (q), parameter :: pi_d = 3.14159265358979323846_q
   real (q), parameter :: sqrtpi_d = 1.77245385090551602729_q
-  real (q), parameter :: Hartree = 27211.6_q ! meV
+  real (q), parameter :: Hartree = 27211.6_q ! meV/Hartree conversion factor 
   real (q), parameter :: BohrMagneton=5.7883818066E-5_q !eV/T
-  real (q), parameter :: GHz = 4.135665E-3_q ! meV
-  real (q), parameter :: time_unit = 2.4188843266E-8_q ! nanoseconds
+  real (q), parameter :: GHz = 4.135665E-3_q ! meV/GHz conversion factor
+  real (q), parameter :: time_unit = 2.4188843266E-8_q ! ! nanoseconds/atomic time unit conversion factor
   complex (qc), parameter :: zero=(0._q,0._q), ui = (0._q,1._q)
   complex (qc), parameter ::  ur = (1._q, 0._q)
+  real (q), PARAMETER :: eps1  = 1.0E-1_q
+  real (q), PARAMETER :: eps2  = 1.0E-2_q
+  real (q), PARAMETER :: eps4  = 1.0E-4_q
+  real (q), PARAMETER :: eps6  = 1.0E-6_q
+  real (q), PARAMETER :: eps8  = 1.0E-8_q
+  real (q), PARAMETER :: eps12 = 1.0E-12_q
+  real (q), PARAMETER :: eps14 = 1.0E-14_q
+  real (q), PARAMETER :: eps16 = 1.0E-16_q
+  real (q), PARAMETER :: eps24 = 1.0E-24_q
+  real (q), PARAMETER :: eps32 = 1.0E-32_q
 
 ! numbers
   integer :: Nd, i_m, Nplot, Ndim, Nfreq, Ntime, N_int, Nbias

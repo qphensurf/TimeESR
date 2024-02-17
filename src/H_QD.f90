@@ -115,6 +115,7 @@ else
    write (*,*) '**************************************************'
    write (*,*) ' '
    ! reading is finished
+   
 endif
         
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -134,6 +135,13 @@ endif
       endif
 ! meV to a.u.
       eps_QD = eps_QD / Hartree; U_Hubbard=U_Hubbard / Hartree
+
+! Check for sanity against the cutoff range of the Fermi integral
+   if (Cutoff .lt. (2.*eps_QD+U_Hubbard)) then
+        print *, 'WARNING: Cutoff value is smaller than 2eps+U. Fermi integrals may not converge.'
+   end if
+
+
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !                                                                                                     !
 ! Electronic Hamiltonian: first site, dimension N_in (1) = 4                                          !

@@ -25,9 +25,23 @@ CONTAINS
      integer :: v, l, j, u, n
      complex (qc) :: g0p_up, g0m_up, g1p_up, g1m_up
      complex (qc) :: g0p_dn, g0m_dn, g1p_dn, g1m_dn, pulse
-     complex (qc) :: Lvluj, Ljulv
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+     complex (qc) :: Lvluj, Ljulv 
 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    
+   
+   
+     open(666, file='rates', status='unknown')
+     open(667, file='rates_R', status='unknown')
+     open(668, file='rates_L', status='unknown')    
+     open(669, file='rates_R_major', status='unknown')
+     open(670, file='rates_L_major', status='unknown')
+     open(671, file='lambda', status='unknown')
+     open(672, file='gamma_pos_R', status='unknown')
+     open(673, file='gamma_neg_R', status='unknown')
+     open(674, file='gamma_pos_L', status='unknown')
+     open(675, file='gamma_neg_L', status='unknown')
+ 
      do n=1,Nbias
      do j=1,Ndim
      do u=1,Ndim
@@ -44,16 +58,24 @@ CONTAINS
       g0p_dn = gamma_R_0*fermiR*(1._q-Spin_polarization_R)*0.5_q
       g0m_dn = gamma_R_0*ufermiR*(1._q-Spin_polarization_R)*0.5_q
 
+      write(672,*) j, u, n, g0p_up*Hartree/GHz, g0p_dn*Hartree/GHz ! Units in GHz
+      write(673,*) j, u, n, g0m_up*Hartree/GHz, g0m_dn*Hartree/GHz ! Units in GHz
+
 ! Left electrode
 
       g1p_up = gamma_L_0*fermiL*(1._q+Spin_polarization_L)*0.5_q
       g1m_up = gamma_L_0*ufermiL*(1._q+Spin_polarization_L)*0.5_q
       g1p_dn = gamma_L_0*fermiL*(1._q-Spin_polarization_L)*0.5_q
       g1m_dn = gamma_L_0*ufermiL*(1._q-Spin_polarization_L)*0.5_q
-
+      
+      write(674,*) j, u, n, g1p_up*Hartree/GHz, g1p_dn*Hartree/GHz ! Units in GHz
+      write(675,*) j, u, n, g1m_up*Hartree/GHz, g1m_dn*Hartree/GHz ! Units in GHz
 
         do v=1,Ndim
         do l=1,Ndim
+            
+            if (j .eq. 1 .and. u .eq. 1) write(671,*) v, l, lambda (v,l,1), lambda (v,l,2)
+        
             Lvluj = lambda (v,l,1)*conjg(lambda(u,j,1))*g0p_up+  &
                     lambda (v,l,2)*conjg(lambda(u,j,2))*g0p_dn
             Ljulv = lambda (j,u,1)*conjg(lambda(l,v,1))*g0m_up+  &
@@ -70,12 +92,53 @@ CONTAINS
 ! Left electrode
             G (v,l,j,u,2,n) = 0.5_q*(Lvluj + Ljulv)
             
-            !if(write_rates) write(666,*) v, l, j, u, n, G(v,l,j,u,1,n)*Hartree/GHz, G(v,l,j,u,2,n)*Hartree/GHz
+            if ( (abs(REAL(G(v,l,j,u,1,n)*Hartree/GHz,q)) >= eps4 ) &
+                 .or. (abs(IMAG(G(v,l,j,u,1,n)*Hartree/GHz)) >= eps4) &
+                 .or. (abs(REAL(G(v,l,j,u,2,n)*Hartree/GHz,q)) >= eps4) &
+                 .or. (abs(IMAG(G(v,l,j,u,2,n)*Hartree/GHz)) >= eps4) ) then
+               write(666,*) v, l, j, u, n, G(v,l,j,u,1,n)*Hartree/GHz, G(v,l,j,u,2,n)*Hartree/GHz ! Units in GHz
+            end if
+
+            if ( (abs(REAL(G(v,l,j,u,1,n)*Hartree/GHz,q)) >= eps2 ) &
+                 .or. (abs(IMAG(G(v,l,j,u,1,n)*Hartree/GHz)) >= eps2) ) then 
+               write(667,*) v, l, j, u, n, G(v,l,j,u,1,n)*Hartree/GHz ! Units in GHz
+            end if
+
+
+            if ( (abs(REAL(G(v,l,j,u,2,n)*Hartree/GHz,q)) >= eps2 ) &
+                 .or. (abs(IMAG(G(v,l,j,u,2,n)*Hartree/GHz)) >= eps2) ) then 
+               write(668,*) v, l, j, u, n, G(v,l,j,u,2,n)*Hartree/GHz ! Units in GHz
+            end if
+
+
+            if ( (abs(REAL(G(v,l,j,u,1,n)*Hartree/GHz,q)) >= eps1 ) &
+                 .or. (abs(IMAG(G(v,l,j,u,1,n)*Hartree/GHz)) >= eps1) ) then
+               write(669,*) v, l, j, u, n, G(v,l,j,u,1,n)*Hartree/GHz ! Units in GHz
+            end if
+
+
+            if ( (abs(REAL(G(v,l,j,u,2,n)*Hartree/GHz,q)) >= eps1 ) &
+                 .or. (abs(IMAG(G(v,l,j,u,2,n)*Hartree/GHz)) >= eps1) ) then
+               write(670,*) v, l, j, u, n, G(v,l,j,u,2,n)*Hartree/GHz ! Units in GHz
+            end if
+
+
         enddo
         enddo
       enddo
      enddo
      enddo
+     
+     close(666)
+     close(667)
+     close(668)
+     close(669)
+     close(670)
+     close(671)
+     close(672)
+     close(673)
+     close(674)
+     close(675)    
 
      return
 
@@ -110,7 +173,12 @@ CONTAINS
      complex (qc) :: Lvluja, Ljulva
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-            
+     if( Electrode == 1) then
+      open(666, file='ratesC_R', status='unknown')
+     else
+      open(666, file='ratesC_L', status='unknown')
+     end if
+               
      do n =1,Nbias
      do j=1,Ndim
      do u=1,Ndim
@@ -158,12 +226,17 @@ CONTAINS
               
             GC (v,l,j,u,n) = GC (v,l,j,u,n) + 0.5_q*(Lvluja - Ljulva) ! This has the right admixture of electrodes
 
-
+            if( (abs(REAL(GC(v,l,j,u,n)*Hartree/GHz,q)) >= eps2) &
+                 .or. (abs(IMAG(GC(v,l,j,u,n)*Hartree/GHz)) >= eps2) ) then
+               write(666,*) v, l, j, u, n, GC(v,l,j,u,n)*Hartree/GHz ! Units in GHz
+            end if
         enddo
         enddo
       enddo
      enddo
      enddo
+     
+     close(666)
          
      return
 
@@ -202,7 +275,7 @@ CONTAINS
         ! Checking for underflow errors
         if ( arg(i) < log(tiny(1.0_q)) ) then
           truncate_flag(i) = .TRUE.
-          report_truncate = .TRUE.
+          report_truncate = .FALSE. ! Changed from true to get rid of extra messages
         end if
      end do
      
@@ -309,7 +382,7 @@ CONTAINS
      allocate (ufermiL_a(Ndim,Ndim,Nbias))
 
 ! Bias intergal
-     print_flag = .TRUE.
+     print_flag = .FALSE.
      do n = 1, Nbias
 ! I11 and I21 from the Manual are honored here:
      do j=1,Ndim
@@ -589,7 +662,7 @@ CONTAINS
                         for bias direction, number, and state combination: "
             print_flag = .FALSE.
          end if
-         write(*,*) trim(bias_dir), i_n, i_j, i_u
+         !write(*,*) trim(bias_dir), i_n, i_j, i_u ! Changed to get rid of extra messages
       end if
       
       e = Cutoff

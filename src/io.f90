@@ -160,8 +160,7 @@ CONTAINS
               print *, ' '
               stop
          endif
-
-
+        
 ! creation of the time arrays for Runge Kutta and for pulse generation
          stept = (t_final - t_initial) / (Ntime-1)
     do i=1, Ntime
@@ -419,8 +418,8 @@ CONTAINS
        implicit none
        integer, parameter :: q = SELECTED_REAL_KIND(10)
        real (q), parameter :: pi_d = 3.14159265358979323846_q
-       real (q), parameter :: time_unit = 2.4188843266E-8_q ! nanoseconds
-       real (q), parameter :: Hartree = 27211.6_q ! meV
+       real (q), parameter :: time_unit = 2.4188843266E-8_q ! nanoseconds/atomic time unit
+       real (q), parameter :: Hartree = 27211.6_q ! meV/Hartree 
        real (q), parameter :: BohrMagneton=5.7883818066E-5_q !eV/T
    real (q) :: t0 (:), t1(:)
    real (q) :: Freq_seq (:,:)

@@ -1,5 +1,5 @@
 from os import sys
-from tepy.negativity import *
+from tepy.entanglement.negativity import *
 
 filename = sys.argv[1]
 total_dim = int(sys.argv[2])

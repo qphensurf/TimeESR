@@ -9,7 +9,7 @@
 
 # GNU Compiler
 FC = gfortran
-FFLAGS = -O
+#FFLAGS = -O
 
 # Intel compiler
 #FC = ifort

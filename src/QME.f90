@@ -362,7 +362,7 @@ CONTAINS
      real (q), intent (in):: Freq_seq (:,:) ! sequence of pulses
      real (q), intent (in):: Phase_seq (:) ! sequence of pulses
 ! Computed in ExtendedFermiIntegral
-     complex (qc) :: fermiR, fermiL, ufermiR, ufermiL
+     complex (qc) :: fermiR, fermiL, ufermiR, ufermiL, fermiR_comp, fermiL_comp, ufermiR_comp, ufermiL_comp 
      complex (qc), allocatable:: fermiR_a(:,:,:), fermiL_a(:,:,:)
      complex (qc), allocatable:: ufermiR_a(:,:,:), ufermiL_a(:,:,:)
 ! internal
@@ -381,16 +381,37 @@ CONTAINS
      allocate (ufermiR_a(Ndim,Ndim,Nbias))
      allocate (ufermiL_a(Ndim,Ndim,Nbias))
 
+     !print *, "Starting test of Fermi integration"
+     !call test_integration_methods( -1100./Hartree, 1100./Hartree, 500, 0.0_q, Temperature, Cutoff, &
+     !     GammaC, N_int, fermiL )
+
 ! Bias intergal
      print_flag = .FALSE.
      do n = 1, Nbias
 ! I11 and I21 from the Manual are honored here:
      do j=1,Ndim
      do u=1,Ndim
-      call ExtendedFermiIntegral ( Delta (j,u), bias_R (n), Temperature, Cutoff, GammaC, N_int, fermiR, n, j, u, 'R', print_flag )
-      call ExtendedFermiIntegral ( Delta (j,u), bias_L (n), Temperature, Cutoff, GammaC, N_int,  fermiL, n, j, u, 'L', print_flag )
-      call ExtendeduFermiIntegral ( Delta (j,u), bias_R (n), Temperature, Cutoff, GammaC, N_int, ufermiR)
-      call ExtendeduFermiIntegral ( Delta (j,u), bias_L (n), Temperature, Cutoff, GammaC, N_int,  ufermiL)
+     
+      call ExtendedFermiIntegral ( Delta (j,u), bias_R (n), Temperature, Cutoff, GammaC, N_int,fermiR, n, j, u, 'R', &
+                                   print_flag )
+      call ExtendedFermiIntegral ( Delta (j,u), bias_L (n), Temperature, Cutoff, GammaC, N_int,  fermiL, n, j, u, 'L', &
+                                   print_flag )
+      call ExtendeduFermiIntegral ( Delta (j,u), bias_R (n), Temperature, Cutoff, GammaC, N_int, ufermiR )
+      call ExtendeduFermiIntegral ( Delta (j,u), bias_L (n), Temperature, Cutoff, GammaC, N_int,  ufermiL )
+     
+      !call ExtendedFermiIntegral ( Delta (j,u), bias_R (n), Temperature, Cutoff, GammaC, N_int, fermiR_comp, n, j, u, 'R', &
+      !                             print_flag, method_req='adap' )
+      !call ExtendedFermiIntegral ( Delta (j,u), bias_L (n), Temperature, Cutoff, GammaC, N_int,  fermiL_comp, n, j, u, 'L', &
+      !                             print_flag, method_req='adap' )
+      !call ExtendeduFermiIntegral ( Delta (j,u), bias_R (n), Temperature, Cutoff, GammaC, N_int, ufermiR_comp, &
+      !                              method_req='adap')
+      !call ExtendeduFermiIntegral ( Delta (j,u), bias_L (n), Temperature, Cutoff, GammaC, N_int,  ufermiL_comp, &
+      !                              method_req='adap')
+                                    
+      !print *, "Comparison of EFI R: ", fermiR_comp - fermiR
+      !print *, "Comparison of EFI L: ", fermiL_comp - fermiL
+      !print *, "Comparison of EFUI R: ",ufermiR_comp - fermiR
+      !print *, "Comparison of EFUI L: ",ufermiL_comp - fermiL
 !The idea is to create an array and pass it to the rates routine
       fermiR_a(j,u,n) = fermiR  / pi_d !important pi factor, see Manual
       fermiL_a(j,u,n) = fermiL  / pi_d
@@ -621,65 +642,93 @@ CONTAINS
 
 
 ! Calculation of energy integration of rates involving the Fermi function
-      subroutine ExtendedFermiIntegral ( D, V, T, Cutoff, GammaC, N,  fermiA, i_n, i_j, i_u, bias_dir, print_flag )
+      subroutine ExtendedFermiIntegral ( D, V, T, Cutoff, GammaC, N,  fermiA, i_n, i_j, i_u, bias_dir, &
+                                         print_flag, method_req, tolerance )
       implicit none
       real (q) :: D, V, T, Cutoff, GammaC
       real (q) :: e, step_e
-      integer :: i, N
+      integer :: i, N, nrecursive
       complex (qc):: fermiA
       logical :: truncate_flag
       integer :: i_n, i_j, i_u
       character(len=*) :: bias_dir
       logical :: print_flag
+      character(len=*), optional :: method_req
+      real(q), optional :: tolerance
+      character(len=4) :: method      
 !fermiA is Integral I11 of the Manual
-! Trapeze-integration (the best among the better)
 
-      step_e = 2._q*Cutoff/(N-1._q)
-      e = -Cutoff
-      fermiA = 0.5_q*Fermi(e-V,T) / (e - D + ui*GammaC)
-      truncate_flag = .FALSE.
-      
-      do i = 2, N-1
-         e= -Cutoff + (i-1._q)*step_e       
+      if (.not. present(method_req)) then
+         method = 'trap'
+      else
+         method = method_req
+      end if      
+
+      if (method .eq. 'trap') then
+         ! Trapeze-integration (the best among the better)
+
+         step_e = 2._q*Cutoff/(N-1._q)
+         e = -Cutoff
+         fermiA = 0.5_q*Fermi(e-V,T) / (e - D + ui*GammaC)
+         truncate_flag = .FALSE.
          
-         ! Found an issue with dividing a small e-D quantity into a very small Fermi
-         ! By including GammaC, Fortran performs a multiplication of the numerator by
-         ! (e-D,-GammaC) and the denominator becomes |(e-D,GammaC)|^2. The first step
-         ! may underflow the real register, and so we handle it the best we can.
-         if(Fermi(e-V,T) .ne. 0._q) then
-            if((log(Fermi(e-V,T)) + log(abs(e-D)))-6._q .ge. log(tiny(1._q))) then
-               fermiA = fermiA + Fermi(e-V,T) / (e - D + ui*GammaC)
-            else
-               truncate_flag = .TRUE.
+         do i = 2, N-1
+            e= -Cutoff + (i-1._q)*step_e       
+            
+            ! Found an issue with dividing a small e-D quantity into a very small Fermi
+            ! By including GammaC, Fortran performs a multiplication of the numerator by
+            ! (e-D,-GammaC) and the denominator becomes |(e-D,GammaC)|^2. The first step
+            ! may underflow the real register, and so we handle it the best we can.
+            if(Fermi(e-V,T) .ne. 0._q) then
+               if((log(Fermi(e-V,T)) + log(abs(e-D)))-6._q .ge. log(tiny(1._q))) then
+                  fermiA = fermiA + Fermi(e-V,T) / (e - D + ui*GammaC)
+               else
+                  truncate_flag = .TRUE.
+               end if
             end if
+           
+         enddo
+         
+         if(truncate_flag) then
+            if (print_flag) then
+               write(*,*) "Truncated ExtendedFermiIntegral, &
+                           for bias direction, number, and state combination: "
+               print_flag = .FALSE.
+            end if
+            !write(*,*) trim(bias_dir), i_n, i_j, i_u ! Changed to get rid of extra messages
          end if
-        
-      enddo
-      
-      if(truncate_flag) then
-         if (print_flag) then
-            write(*,*) "Truncated ExtendedFermiIntegral, &
-                        for bias direction, number, and state combination: "
-            print_flag = .FALSE.
-         end if
-         !write(*,*) trim(bias_dir), i_n, i_j, i_u ! Changed to get rid of extra messages
+         
+         e = Cutoff
+         fermiA = fermiA + 0.5_q*Fermi(e-V,T) / (e - D + ui*GammaC)
+         fermiA = step_e*ui*fermiA
+      else
+         call test_extendedFermi( D, V, T, GammaC, -Cutoff, Cutoff, fermiA )
+         fermiA = ui*fermiA
       end if
-      
-      e = Cutoff
-      fermiA = fermiA + 0.5_q*Fermi(e-V,T) / (e - D + ui*GammaC)
-      fermiA = step_e*ui*fermiA
 
       return
       end subroutine ExtendedFermiIntegral
       
 ! Calculation of energy integration of rates involving 1-Fermi function
-      subroutine ExtendeduFermiIntegral ( D, V,  T, Cutoff, GammaC, N, ufermiA)
+      subroutine ExtendeduFermiIntegral ( D, V,  T, Cutoff, GammaC, N, ufermiA, method_req, tolerance )
       implicit none
       real (q) :: D, V, T, Cutoff, GammaC
       real (q) :: e, step_e
-      integer :: i, N
+      integer :: i, N, nrecursive
       complex (qc):: ufermiA
+      character(len=4) :: method
+      character(len=*), optional :: method_req
+      real(q), optional :: tolerance 
 !ufermiA is Integral I21 of the Manual
+
+   if (.not. present(method_req)) then
+      method = 'trap'
+   else
+      method = method_req
+   end if   
+
+   if (method .eq. 'trap') then
+
 ! Trapeze-integration (the best among the better)
 
       step_e = 2._q*Cutoff/(N-1._q)
@@ -694,9 +743,311 @@ CONTAINS
       ufermiA=ufermiA+0.5_q*(1._q-Fermi (e-V, T)) / (e+D-ui*GammaC)
 
       ufermiA = -step_e*ui*ufermiA
+   else
+      call test_extendedFermi( D, V, T, GammaC, -Cutoff, Cutoff, ufermiA )
+      ufermiA = -ui*ufermiA
+   end if
+   return
+      
+      end subroutine ExtendeduFermiIntegral 
+      
+   subroutine test_qagp
+        implicit none
 
-      return
-      end subroutine ExtendeduFermiIntegral
+        integer, parameter :: npts2 = 4
+        integer, parameter :: limit = 1000
+        integer, parameter :: leniw = limit*2 + npts2
+        integer, parameter :: lenw = limit*4 + npts2
+        real(q), parameter :: a = 0.0_q
+        real(q), parameter :: b = 1.0_q
+        real(q), parameter :: answer = 4.25368768812224946110743394858422_q
+        real(q), parameter :: epsabs = 0.0_q
+        real(q), parameter :: epsrel = 10**(log10(epsilon(1.0_q))/2.0_q+1)
+        real(q), dimension(npts2), parameter :: points = [1.0_q/7.0_q, &
+                                                           2.0_q/3.0_q, &
+                                                           0.0_q, &
+                                                           0.0_q]
 
+        real(q) :: abserr, result, work(lenw)
+        integer :: ier, iwork(leniw), last, neval
+
+        call dqagp(f, a, b, npts2, points, epsabs, epsrel, result, abserr, &
+                   neval, ier, leniw, lenw, last, iwork, work)
+
+        ! answer from maxima: quad_qags(abs(x-1/7)^(-0.25)*abs(x-2/3)^(-0.55), x, 0, 1);
+
+    contains
+
+        real(q) function f(x)
+            implicit none
+            real(q), intent(in) :: x
+            f = 0.0_q
+            if (x /= 1.0_q/7.0_q .and. x /= 2.0_q/3.0_q) f = &
+                abs(x - 1.0_q/7.0_q)**(-0.25_q)* &
+                abs(x - 2.0_q/3.0_q)**(-0.55_q)
+            return
+        end function f
+
+    end subroutine test_qagp
+    
+   subroutine test_extendedFermi( D, V, T, GammaC, a, b, result )
+   
+        ! Note: adaptive integration is good, but the real part does
+        !       not converge, even with 10000 subdivisions.
+         
+        implicit none
+
+        real(q), intent(in) :: D, V, T, GammaC, a, b
+
+        integer, parameter :: npts2 = 1 + 2
+        integer, parameter :: limit = 10000
+        integer, parameter :: leniw = (2*limit)+npts2
+        integer, parameter :: lenw = (limit*4) + npts2
+
+        complex(qc), intent(out) :: result
+        real(q) :: result_r, result_i
+        real(q) :: abserr, work(lenw)
+        integer :: ier, iwork(leniw), last, neval
+
+        real(q), parameter :: epsabs = 0.0_q
+        real(q), parameter :: epsrel = 10**(log10(epsilon(1.0_q))/2.0_q+1)
+
+        
+        real(q), dimension(npts2) :: points
+        
+        points = [D, 0.0_q, 0.0_q]
+
+        ! Real part
+        call dqagp(f1, a, b, npts2, points, epsabs, epsrel, result_r, abserr, neval, &
+                   ier, leniw, lenw, last, iwork, work)
+        if (ier .ne. 0) print *, 'error code in real part found:', ier, 'for D (meV): ', D*Hartree
+        
+        points = [GammaC, 0.0_q, 0.0_q]
+        
+        ! Imag part
+        call dqagp(g1, a, b, npts2, points, epsabs, epsrel, result_i, abserr, neval, &
+                   ier, leniw, lenw, last, iwork, work)
+        if (ier .ne. 0) print *, 'error code in imag part found:', ier, 'for D (meV): ', D*Hartree
+
+        result = cmplx(result_r, result_i)
+
+    contains
+
+        real(q) function f1(e, D, V, T, GammaC)
+            implicit none
+            real(q), intent(in) :: e, D, V, T, GammaC
+            f1 = 0.0_q
+            f1 = real(Fermi(e-V,T) / (e - D + ui*GammaC),q)
+        end function f1
+        
+        real(q) function g1(e, D, V, T, GammaC)
+            implicit none
+            real(q), intent(in) :: e, D, V, T, GammaC
+            g1 = 0.0_q
+            g1 = imag(Fermi(e-V,T) / (e - D + ui*GammaC))
+        end function g1
+
+    end subroutine test_extendedFermi 
+    
+    
+   subroutine test_extendedFermi_infinite( D, V, T, GammaC, result )
+   
+        ! Note: adaptive integration is good, but the imaginary part does
+        !       not converge, even with 1000 subdivisions. I needed 10000
+        !       maximum. The pole should be taken care of better.
+         
+        implicit none
+
+        real(q), intent(in) :: D, V, T, GammaC
+
+        real(q), parameter :: boun = 0.0_q
+        integer, parameter :: inf = 2
+        integer, parameter :: limit = 1000
+        integer, parameter :: lenw = limit*4
+
+        complex(qc), intent(out) :: result
+        real(q) :: result_r, result_i
+        real(q) :: abserr, work(lenw)
+        integer :: ier, iwork(limit), last, neval
+
+        real(q), parameter :: epsabs = 0.0_q
+        real(q), parameter :: epsrel = 10**(log10(epsilon(1.0_q))/2.0_q+1)
+
+        ! Real part
+        call dqagi(f1, boun, inf, epsabs, epsrel, result_r, abserr, neval, &
+                   ier, limit, lenw, last, iwork, work)
+        if (ier .ne. 0) print *, 'error code in real part found:', ier, 'for D (meV): ', D*Hartree
+        
+        ! Imag part
+        call dqagi(g1, boun, inf, epsabs, epsrel, result_i, abserr, neval, &
+                   ier, limit, lenw, last, iwork, work)
+        if (ier .ne. 0) print *, 'error code in imag part found:', ier, 'for D (meV): ', D*Hartree
+
+        result = cmplx(result_r, result_i)
+
+    contains
+
+        real(q) function f1(e, D, V, T, GammaC)
+            implicit none
+            real(q), intent(in) :: e, D, V, T, GammaC
+            f1 = 0.0_q
+            f1 = real(Fermi(e-V,T) / (e - D + ui*GammaC),q)
+        end function f1
+        
+        real(q) function g1(e, D, V, T, GammaC)
+            implicit none
+            real(q), intent(in) :: e, D, V, T, GammaC
+            g1 = 0.0_q
+            g1 = imag(Fermi(e-V,T) / (e - D + ui*GammaC))
+        end function g1
+
+    end subroutine test_extendedFermi_infinite
+
+   subroutine test_extendeduFermi( D, V, T, GammaC, result )
+        implicit none
+
+        real(q), intent(in) :: D, V, T, GammaC
+
+        real(q), parameter :: boun = 0.0_q
+        integer, parameter :: inf = 2
+        integer, parameter :: limit = 100
+        integer, parameter :: lenw = limit*4
+
+        complex(qc), intent(out) :: result
+        real(q) :: result_r, result_i
+        real(q) :: abserr, work(lenw)
+        integer :: ier, iwork(limit), last, neval
+
+        real(q), parameter :: epsabs = 0.0_q
+        real(q), parameter :: epsrel = 10**(log10(epsilon(1.0_q))/2.0_q+1)
+
+        ! Real part
+        call dqagi(f2, boun, inf, epsabs, epsrel, result_r, abserr, neval, &
+                   ier, limit, lenw, last, iwork, work)
+        if (ier .ne. 0) print *, 'error code in real part found:', ier, 'for D (meV): ', D*Hartree
+        
+        ! Imag part
+        call dqagi(g2, boun, inf, epsabs, epsrel, result_i, abserr, neval, &
+                   ier, limit, lenw, last, iwork, work)
+        if (ier .ne. 0) print *, 'error code in imag part found:', ier, 'for D (meV): ', D*Hartree
+
+        result = cmplx(result_r, result_i)
+
+    contains
+
+        real(q) function f2(e, D, V, T, GammaC)
+            implicit none
+            real(q), intent(in) :: e, D, V, T, GammaC
+            f2 = 0.0_q
+            f2 = real((1.0_q-Fermi(e-V,T)) / (e + D - ui*GammaC),q)
+        end function f2
+        
+        real(q) function g2(e, D, V, T, GammaC)
+            implicit none
+            real(q), intent(in) :: e, D, V, T, GammaC
+            g2 = 0.0_q
+            g2 = imag((1.0_q-Fermi(e-V,T)) / (e + D - ui*GammaC))
+        end function g2
+
+    end subroutine test_extendeduFermi
+
+
+   subroutine test_integration_methods( D_start, D_end, n_d, V, T, Cutoff, GammaC, N, fermiA, tolerance )
+   
+      implicit none
+      
+      real (q), intent(in) :: D_start, D_end, V, T, Cutoff, GammaC
+      real (q) :: e, step_e
+      integer, intent(in) :: n_d
+      real (q) :: D, dD
+      integer :: i, n_i, N, nrecursive
+      complex (qc), intent(inout):: fermiA
+      complex (qc) :: fermiA_manual!, fermiA_old
+      logical :: truncate_flag
+      real(q), optional, intent(in) :: tolerance
+
+      dD = (D_end - D_start)/real(n_d-1,q)
+      
+      open(unit=200,file='test_integration_methods.dat')
+      
+      do n_i = 1, n_d
+      
+         D = D_start + (real(n_i-1,q)*dD)
+         print *, "     Calculating D = ",D
+      
+      
+         ! Original integration of Nico without corrections
+         ! This was tested against my version and produces the same exact results
+         ! But without the warnings that accompany it
+         ! -------------------------------
+         ! Trapeze-integration (the best among the better)
+      
+         !step_e = 2*Cutoff/(N-1)
+         !e= -Cutoff
+         !fermiA_old=0.5*Fermi (e-V, T) / (e-D+ui*GammaC)
+         
+         !do i = 2, N-1
+         !   e= -Cutoff + (i-1)*step_e
+         !   fermiA_old=fermiA_old+Fermi (e-V, T) / (e-D+ui*GammaC)
+         !enddo                  
+         !e = Cutoff
+         !fermiA_old = fermiA_old + 0.5_q*Fermi(e-V,T) / (e - D + ui*GammaC)
+         !fermiA_old = step_e*ui*fermiA_old/pi_d
+      
+      
+         ! Original integration of Nico with corrections
+         ! -------------------------------
+         ! Trapeze-integration (the best among the better)
+      
+         step_e = 2._q*Cutoff/(N-1._q)
+         e = -Cutoff
+         fermiA = 0.5_q*Fermi(e-V,T) / (e - D + ui*GammaC)
+         truncate_flag = .FALSE.
+         
+         do i = 2, N-1
+            e= -Cutoff + (i-1._q)*step_e       
+            
+            ! Found an issue with dividing a small e-D quantity into a very small Fermi
+            ! By including GammaC, Fortran performs a multiplication of the numerator by
+            ! (e-D,-GammaC) and the denominator becomes |(e-D,GammaC)|^2. The first step
+            ! may underflow the real register, and so we handle it the best we can.
+            if(Fermi(e-V,T) .ne. 0._q) then
+               if((log(Fermi(e-V,T)) + log(abs(e-D)))-6._q .ge. log(tiny(1._q))) then
+                  fermiA = fermiA + Fermi(e-V,T) / (e - D + ui*GammaC)
+               else
+                  truncate_flag = .TRUE.
+               end if
+            end if
+           
+         enddo
+                  
+         e = Cutoff
+         fermiA = fermiA + 0.5_q*Fermi(e-V,T) / (e - D + ui*GammaC)
+         fermiA = step_e*ui*fermiA/pi_d
+         
+         !if((abs(real(fermiA_old - fermiA,q)) .gt. eps32) .or. (abs(imag(fermiA_old - fermiA)) .gt. eps32)) &
+         !    print *, "FermiA not equal to FermiA_old at Delta ", D
+      
+         ! Adaptive integral, simple
+         ! -------------------------------
+         !nrecursive = 1
+         !fermiA_manual = adaptive_integral(f_i, -Cutoff, Cutoff, tolerance, D, V, T, GammaC, nrecursive)
+         !fermiA_manual = ui*fermiA_manual/pi_d
+         
+         ! Adaptive QUAD from Lapack
+         !call test_extendedFermi( D, V, T, GammaC, -Cutoff, Cutoff, fermiA_manual )
+         !fermiA_manual = ui*fermiA_manual/pi_d
+         fermiA_manual = cmplx(0.0_q,0.0_q)
+         
+         write(200,*) D*Hartree, real(fermiA,q), imag(fermiA), &
+                      real(fermiA_manual,q), imag(fermiA_manual), nrecursive
+      
+      end do
+      
+      close(200)
+      
+      stop
+      
+   end subroutine
      
 end module QME

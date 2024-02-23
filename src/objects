@@ -13,6 +13,7 @@ SOURCE = declarations.o \
          spin_parameters.o \
          KrondProd.o \
          H_QD.o \
+         quadpack_double.o \
          QME.o \
          Transport.o \
          SpinTools.o \

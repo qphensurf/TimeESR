@@ -1,6 +1,6 @@
 # TimeESR v1.0.2
 An STM-ESR code solving a QME in the time domain. TimeESR is given as is and subject to gnu 3.0 CopyLeft. 
-Enjoy! TimeESR team, February 23, 2024.
+Enjoy! TimeESR team, February 17, 2024.
 
 ## Intended Use
 The code is intended for computing ESR in an STM junction, where the driving is produced by the modulation of the electron hopping integrals. It models one electronic orbital coupled to a complex system of spins. It is intended for (i) obtaining continuous-wave ESR spectra (our Floquet code is better suited for this), (ii) doing quantum operations driving spins with short pulses, and (iii) using multiple driving frequencies as is done in state-of-the-art STM-ESR.

@@ -1,0 +1,13 @@
+Purpose
+-------
+Tools for plotting quantities from TimeESR using matplotlib.
+
+Instructions
+-------
+1. Add the TimeESR folder (which should contain the tepy folder)
+   to your PYTHONPATH:
+       export PYTHONPATH=$PYTHONPATH:(path)
+
+2. Example python scripts and bash scripts to call
+   them are located in the Z_TEPY folder in the examples folder.
+

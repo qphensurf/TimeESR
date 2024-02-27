@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib
 import numpy as np
+from scipy.fft import fft, fftfreq
 from tepy.globalvars import *
 
 def get_data( filename='POPULATIONS.dat' ):
@@ -76,3 +77,24 @@ def get_neg_exp_curve( x, y ):
    
    return x_curve, y_curve, tau
  
+def extract_peak_frequency(data, start, end, steps):
+   """
+   Get the peak frequency from a data set
+   """
+   sample_rate = (end-start)/steps
+   fftfrequencies = fftfreq(steps,sample_rate)[:steps//2]
+   fft_data = (2.0/steps) * np.abs(fft(data)[:steps//2])
+   peak_coefficient = np.argmax(np.abs(fft_data))
+   peak_freq = fftfrequencies[peak_coefficient]
+
+   return abs(peak_freq)
+    
+def get_fft_spectra(data, start, end, steps):
+   """
+   Get the entire FFT spectra from a data set
+   """
+   sample_rate = (end-start)/steps
+   fftfrequencies = fftfreq(steps,sample_rate)[:steps//2]
+   fft_data = (2.0/steps) * np.abs(fft(data)[:steps//2])
+
+   return fft_data, fftfrequencies

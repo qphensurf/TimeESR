@@ -131,8 +131,10 @@ def plot_dmelements( num_dim=4, total_dim=8, datafile='RHO.dat', time_diff=None,
 
       for i in range(2):
          for j in range(2):
+            state_a = list_states[i]
+            state_b = list_states[j]
             color_idx = 2*i + j
-            plot_2d( ax, time, np.real(rho_plot[:,i,j]), xfact=xfact, yfact=yfact, xlim=[xmin,xmax,xdiff], ylim=[-1,1,0.5], marker=None, linewidth=1.5, color=colors[color_idx], name=r'$\rho_{%d%d}$' % (i+1,j+1))
+            plot_2d( ax, time, np.real(rho_plot[:,i,j]), xfact=xfact, yfact=yfact, xlim=[xmin,xmax,xdiff], ylim=[-1,1,0.5], marker=None, linewidth=1.5, color=colors[color_idx], name=r'$\rho_{%d%d}$' % (state_a,state_b))
       if vlines:
          for line in vlines:
             ax.axvline( x=line, color='gray', linestyle='--', linewidth=0.75 )       
@@ -152,8 +154,10 @@ def plot_dmelements( num_dim=4, total_dim=8, datafile='RHO.dat', time_diff=None,
 
       for i in range(2):
          for j in range(2):
+            state_a = list_states[i]
+            state_b = list_states[j]
             color_idx = 2*i + j
-            plot_2d( ax, time, np.imag(rho_plot[:,i,j]), xfact=xfact, yfact=yfact, xlim=[xmin,xmax,xdiff], ylim=[-1,1,0.5], marker=None, linewidth=1.5, color=colors[color_idx], name=r'$\rho_{%d%d}$' % (i+1,j+1))
+            plot_2d( ax, time, np.imag(rho_plot[:,i,j]), xfact=xfact, yfact=yfact, xlim=[xmin,xmax,xdiff], ylim=[-1,1,0.5], marker=None, linewidth=1.5, color=colors[color_idx], name=r'$\rho_{%d%d}$' % (state_a,state_b))
       if vlines:
          for line in vlines:
             ax.axvline( x=line, color='gray', linestyle='--', linewidth=0.75 )     
